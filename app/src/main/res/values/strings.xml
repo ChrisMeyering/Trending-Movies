@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Trending Movies</string>
-    <string name="content_authority">com.movies.chris.trendingmovies</string>
+    <string name="content_authority">com.movies.chris.trendingmovies.data.provider</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -10,16 +10,21 @@
 
     <string name="img_desc_poster">Image View Poster</string>
 
-    <string name="sort_top_rated">Top Rated</string>
-    <string name="sort_most_popular">Most Popular</string>
+    <!--Drawer Layout Actions-->
+    <string name="action_top_rated">Top Rated</string>
+    <string name="action_most_popular">Most Popular</string>
     <string name="action_now_playing">Now Playing</string>
     <string name="action_upcoming">Upcoming</string>
-    <string name="favorites">Favorites</string>
+    <string name="action_favorites">Favorites</string>
+    <string name="action_recents">Recents</string>
 
-    <string name="key_query_url">QUERY_URL</string>
     <string name="search">Search</string>
     <string name="error_msg">An error has occurred. Please try again.</string>
     <string name="txt_load_more">Load more</string>
-    <string name="action_recents">Recents</string>
+    <string name="key_query_uri">QUERY_URI_EXTRA</string>
+    <string name="key_sort_by">SORT_BY_EXTRA</string>
+    <string name="key_page_number">PAGE_NUMBER_EXTRA</string>
+    <string name="exception_drawer_item_not_implemented">Drawer item not implemented</string>
+    <string name="loader_not_implemented">Loader not implemented: %1$d</string>
 
 </resources>

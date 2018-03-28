@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="drawer_index_top_rated">0</integer>
+    <integer name="drawer_index_popular">1</integer>
+    <integer name="drawer_index_now_playing">2</integer>
+    <integer name="drawer_index_upcoming">3</integer>
+    <integer name="drawer_index_recents">4</integer>
+    <integer name="drawer_index_favorites">5</integer>
+</resources>

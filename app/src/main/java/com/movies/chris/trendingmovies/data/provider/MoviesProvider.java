@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 /**
  * Created by chris on 10/31/17.
@@ -20,17 +21,11 @@ public class MoviesProvider extends ContentProvider {
     public static final int CODE_FAVORITES = 100;
     public static final int CODE_FAVORITES_WITH_ID = 101;
     public static final int CODE_RECENT = 200;
-    public static final int CODE_RECENT_WITH_ID = 201;
     public static final int CODE_TOP_RATED = 300;
-    public static final int CODE_TOP_RATED_WITH_ID = 301;
-    public static final int CODE_MOST_POPULAR = 400;
-    public static final int CODE_MOST_POPULAR_WITH_ID = 401;
+    public static final int CODE_POPULAR = 400;
     public static final int CODE_NOW_PLAYING = 500;
-    public static final int CODE_NOW_PLAYING_WITH_ID = 501;
     public static final int CODE_UPCOMING = 600;
-    public static final int CODE_UPCOMING_WITH_ID = 601;
-    public static final int CODE_ALL_MOVIES = 700;
-    public static final int CODE_MOVIES_WITH_ID = 701;
+
     public static final int CODE_GENRE_IDS = 800;
     public static final int CODE_GENRE_IDS_WITH_ID = 801;
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -43,22 +38,14 @@ public class MoviesProvider extends ContentProvider {
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_FAVORITES + "/#", CODE_FAVORITES_WITH_ID);
 
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_RECENT, CODE_RECENT);
-        matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_RECENT + "/#", CODE_RECENT_WITH_ID);
 
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_TOP_RATED, CODE_TOP_RATED);
-        matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_TOP_RATED + "/#", CODE_TOP_RATED_WITH_ID);
 
-        matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_MOST_POPULAR, CODE_MOST_POPULAR);
-        matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_MOST_POPULAR + "/#", CODE_MOST_POPULAR_WITH_ID);
+        matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_POPULAR, CODE_POPULAR);
 
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_NOW_PLAYING, CODE_NOW_PLAYING);
-        matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_NOW_PLAYING + "/#", CODE_NOW_PLAYING_WITH_ID);
 
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_UPCOMING, CODE_UPCOMING);
-        matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_UPCOMING + "/#", CODE_UPCOMING_WITH_ID);
-
-        matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_ALL_MOVIES, CODE_ALL_MOVIES);
-        matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_ALL_MOVIES + "/#", CODE_MOVIES_WITH_ID);
 
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_GENRE_IDS, CODE_GENRE_IDS);
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_GENRE_IDS + "/#", CODE_GENRE_IDS_WITH_ID);
@@ -71,6 +58,7 @@ public class MoviesProvider extends ContentProvider {
         return true;
     }
 
+
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] projection,
@@ -78,60 +66,16 @@ public class MoviesProvider extends ContentProvider {
                         @Nullable String[] selectionArgs,
                         @Nullable String sortOrder) {
         Cursor cursor;
-
-        String[] selectionArguments;
         String tableName = getTableName(uri);
-        switch(sUriMatcher.match(uri)) {
-//            case CODE_FAVORITES:
-//                cursor = mOpenHelper.getReadableDatabase().query(
-//                        MoviesContract.FavoritesEntry.TABLE_NAME,
-//                        projection,
-//                        selection,
-//                        selectionArgs,
-//                        null,
-//                        null,
-//                        sortOrder);
-//                break;
 
-            case CODE_FAVORITES_WITH_ID:
-            case CODE_RECENT_WITH_ID:
-            case CODE_MOVIES_WITH_ID:
-            case CODE_GENRE_IDS_WITH_ID:
-            case CODE_MOST_POPULAR_WITH_ID:
-            case CODE_NOW_PLAYING_WITH_ID:
-            case CODE_TOP_RATED_WITH_ID:
-            case CODE_UPCOMING_WITH_ID:
-                selectionArguments = new String[]{uri.getLastPathSegment()};
-                cursor = mOpenHelper.getReadableDatabase().query(
-                        tableName,
-                        projection,
-                        MoviesContract.MOVIE_ID + " = ? ",
-                        selectionArguments,
-                        null,
-                        null,
-                        sortOrder);
-                break;
-            case CODE_GENRE_IDS:
-                cursor = mOpenHelper.getReadableDatabase().query(
-                        tableName,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder);
-                break;
-            default:
-                cursor = mOpenHelper.getReadableDatabase().query(
-                        tableName,
-                        projection,
-                        selection, // where PageNumber =
-                        selectionArgs, // pageNumber
-                        null,
-                        null,
-                        sortOrder);
-                break;
-        }
+        cursor = mOpenHelper.getReadableDatabase().query(
+                tableName,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder);
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
     }
@@ -144,34 +88,27 @@ public class MoviesProvider extends ContentProvider {
 
     private String getTableName(@NonNull Uri uri) {
         switch (sUriMatcher.match(uri)) {
-            case CODE_ALL_MOVIES:
-            case CODE_MOVIES_WITH_ID:
-                return MoviesContract.AllMoviesEntry.TABLE_NAME;
+            case CODE_POPULAR:
+                return MoviesContract.MostPopularEntry.TABLE_NAME;
+            case CODE_NOW_PLAYING:
+                return MoviesContract.NowPlayingEntry.TABLE_NAME;
+            case CODE_TOP_RATED:
+                return MoviesContract.TopRatedEntry.TABLE_NAME;
+            case CODE_UPCOMING:
+                return MoviesContract.UpcomingEntry.TABLE_NAME;
             case CODE_FAVORITES:
             case CODE_FAVORITES_WITH_ID:
                 return MoviesContract.FavoritesEntry.TABLE_NAME;
+            case CODE_RECENT:
+                return MoviesContract.RecentEntry.TABLE_NAME;
             case CODE_GENRE_IDS:
             case CODE_GENRE_IDS_WITH_ID:
                 return MoviesContract.GenreIdsEntry.TABLE_NAME;
-            case CODE_MOST_POPULAR:
-            case CODE_MOST_POPULAR_WITH_ID:
-                return MoviesContract.MostPopularEntry.TABLE_NAME;
-            case CODE_NOW_PLAYING:
-            case CODE_NOW_PLAYING_WITH_ID:
-                return MoviesContract.NowPlayingEntry.TABLE_NAME;
-            case CODE_RECENT:
-            case CODE_RECENT_WITH_ID:
-                return MoviesContract.RecentEntry.TABLE_NAME;
-            case CODE_TOP_RATED:
-            case CODE_TOP_RATED_WITH_ID:
-                return MoviesContract.TopRatedEntry.TABLE_NAME;
-            case CODE_UPCOMING:
-            case CODE_UPCOMING_WITH_ID:
-                return MoviesContract.UpcomingEntry.TABLE_NAME;
             default:
                 throw new SQLException("Unrecognized URI: " + uri);
         }
     }
+
     @Override
     public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
@@ -184,8 +121,11 @@ public class MoviesProvider extends ContentProvider {
                 if (_id <= 0) {
                     throw new SQLException("Failed to insert row into uri: " + uri);
                 }
+                rowsInserted++;
             }
             db.setTransactionSuccessful();
+        } catch (SQLException e) {
+            Log.i(TAG, e.getMessage());
         } finally {
             db.endTransaction();
         }
@@ -222,17 +162,10 @@ public class MoviesProvider extends ContentProvider {
         String tableName = getTableName(uri);
         switch (sUriMatcher.match(uri)) {
             case CODE_FAVORITES_WITH_ID:
-            case CODE_RECENT_WITH_ID:
-            case CODE_MOVIES_WITH_ID:
-            case CODE_GENRE_IDS_WITH_ID:
-            case CODE_MOST_POPULAR_WITH_ID:
-            case CODE_NOW_PLAYING_WITH_ID:
-            case CODE_TOP_RATED_WITH_ID:
-            case CODE_UPCOMING_WITH_ID:
                 selectionArguments = new String[]{uri.getLastPathSegment()};
                 numRowsDeleted = mOpenHelper.getWritableDatabase()
                         .delete(tableName,
-                                MoviesContract.MOVIE_ID + " = ?",
+                                MoviesContract.FavoritesEntry.getWhereClause(),
                                 selectionArguments);
                 break;
             default:

@@ -5,11 +5,11 @@
         <!--android:icon="@drawable/leaderboard_icon_50"-->
         <item
             android:id="@+id/action_sort_rating"
-            android:title="@string/sort_top_rated" />
+            android:title="@string/action_top_rated" />
         <!--android:icon="@drawable/ic_favorite_grey_24dp"-->
         <item
             android:id="@+id/action_sort_pop"
-            android:title="@string/sort_most_popular" />
+            android:title="@string/action_most_popular" />
         <!--android:icon="@drawable/ic_access_time_grey_24dp"-->
         <item
             android:id="@+id/action_now_playing"
@@ -19,11 +19,11 @@
             android:id="@+id/action_upcoming"
             android:title="@string/action_upcoming" />
         <item
-            android:id="@+id/action_recents"
+            android:id="@+id/action_view_recents"
             android:title="@string/action_recents"/>
         <item
             android:id="@+id/action_view_favorites"
             android:icon="@android:drawable/btn_star_big_off"
-            android:title="@string/favorites" />
+            android:title="@string/action_favorites" />
     </group>
 </menu>
