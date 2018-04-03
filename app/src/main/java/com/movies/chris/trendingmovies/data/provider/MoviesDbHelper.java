@@ -24,32 +24,32 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
                 "CREATE TABLE " + MoviesContract.FavoritesEntry.TABLE_NAME + " ("
                         + MoviesContract.FavoritesEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                         + MoviesContract.FavoritesEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL UNIQUE, "
-                        + MoviesContract.FavoritesEntry.COLUMN_POSTER_PATH + " STRING NOT NULL);";
+                        + MoviesContract.FavoritesEntry.COLUMN_POSTER_PATH + " STRING);";
         final String SQL_CREATE_RECENTS_TABLE =
                 "CREATE TABLE " + MoviesContract.RecentEntry.TABLE_NAME + " ("
                         + MoviesContract.RecentEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                         + MoviesContract.RecentEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL UNIQUE, "
-                        + MoviesContract.RecentEntry.COLUMN_POSTER_PATH + " STRING NOT NULL);";
+                        + MoviesContract.RecentEntry.COLUMN_POSTER_PATH + " STRING);";
         final String SQL_CREATE_TOP_RATED_TABLE =
                 "CREATE TABLE " + MoviesContract.TopRatedEntry.TABLE_NAME + " ("
                         + MoviesContract.TopRatedEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                         + MoviesContract.TopRatedEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL UNIQUE, "
-                        + MoviesContract.TopRatedEntry.COLUMN_POSTER_PATH + " STRING NOT NULL);";
+                        + MoviesContract.TopRatedEntry.COLUMN_POSTER_PATH + " STRING);";
         final String SQL_CREATE_MOST_POPULAR_TABLE =
                 "CREATE TABLE " + MoviesContract.MostPopularEntry.TABLE_NAME + " ("
                         + MoviesContract.MostPopularEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                         + MoviesContract.MostPopularEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL UNIQUE, "
-                        + MoviesContract.MostPopularEntry.COLUMN_POSTER_PATH + " STRING NOT NULL);";
+                        + MoviesContract.MostPopularEntry.COLUMN_POSTER_PATH + " STRING);";
         final String SQL_CREATE_UPCOMING_TABLE =
                 "CREATE TABLE " + MoviesContract.UpcomingEntry.TABLE_NAME + " ("
                         + MoviesContract.UpcomingEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                         + MoviesContract.UpcomingEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL UNIQUE, "
-                        + MoviesContract.UpcomingEntry.COLUMN_POSTER_PATH + " STRING NOT NULL);";
+                        + MoviesContract.UpcomingEntry.COLUMN_POSTER_PATH + " STRING);";
         final String SQL_CREATE_NOW_PLAYING_TABLE =
                 "CREATE TABLE " + MoviesContract.NowPlayingEntry.TABLE_NAME + " ("
                         + MoviesContract.NowPlayingEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                         + MoviesContract.NowPlayingEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL UNIQUE, "
-                        + MoviesContract.NowPlayingEntry.COLUMN_POSTER_PATH + " STRING NOT NULL);";
+                        + MoviesContract.NowPlayingEntry.COLUMN_POSTER_PATH + " STRING);";
         final String SQL_CREATE_GENRE_IDS_TABLE =
                 "CREATE TABLE " + MoviesContract.GenreIdsEntry.TABLE_NAME + " ("
                         + MoviesContract.GenreIdsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "

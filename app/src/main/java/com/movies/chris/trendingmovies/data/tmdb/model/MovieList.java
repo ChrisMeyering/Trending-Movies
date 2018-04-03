@@ -73,7 +73,7 @@ public class MovieList implements Parcelable
             try {
                 context.getContentResolver().bulkInsert(uri, getPosterListContentValues());
             } catch (Exception e) {
-                Log.i("MovieList.save", "" );
+                Log.i("MovieList.save", "failed to save " + uri.toString());
             }
         }
     }

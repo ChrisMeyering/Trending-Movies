@@ -1,9 +1,14 @@
 package com.movies.chris.trendingmovies.activity;
 
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -29,6 +34,7 @@ import com.movies.chris.trendingmovies.UI.MovieListAdapter;
 import com.movies.chris.trendingmovies.data.provider.MoviesContract;
 import com.movies.chris.trendingmovies.data.tmdb.model.MovieList;
 import com.movies.chris.trendingmovies.data.tmdb.model.MoviePoster;
+import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncTask;
 import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncUtils;
 
 import butterknife.BindView;
@@ -77,12 +83,40 @@ public class MovieListActivity extends AppCompatActivity
     @BindView(R.id.et_search_by_name)
     EditText etSearchByName;
 
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            isLoading = false;
+            if (intent.getBooleanExtra(getString(R.string.key_sync_success), false)) {
+                Log.i(TAG, "Sync successful");
+                pageCount++;
+                makeSortedMovieSearch(getLoaderID());
+
+            } else {
+                Log.i(TAG, "Error: Sync failed");
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_list);
         initView();
         makeSortedMovieSearch(getLoaderID());
+    }
+
+    @Override
+    protected void onResume() {
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
+                new IntentFilter(MoviesSyncTask.EVENT_SYNC_COMPLETE));
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+        super.onPause();
     }
 
     private int getLoaderID() {
@@ -147,30 +181,21 @@ public class MovieListActivity extends AppCompatActivity
 //        rvMoviePosters.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         movieAdapter = new MovieListAdapter(this, this, pageCount);
         rvMoviePosters.setAdapter(movieAdapter);
-        final RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);//Utility.numOfGridColumns(this));
+        final RecyclerView.LayoutManager layoutManager =
+                new GridLayoutManager(this, 2);
+        //TODO: Utility.numOfGridColumns(this));
         rvMoviePosters.setLayoutManager(layoutManager);
         layoutManager.setAutoMeasureEnabled(true);
         rvMoviePosters.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if(dy > 0) {
-                    GridLayoutManager layoutManager = (GridLayoutManager)rvMoviePosters.getLayoutManager();
+                if(dy >= 0) {
+                    GridLayoutManager layoutManager =
+                            (GridLayoutManager)rvMoviePosters.getLayoutManager();
                     int lastItem = layoutManager.findLastCompletelyVisibleItemPosition();
                     int currentTotalCount = layoutManager.getItemCount();
                     if (currentTotalCount <= lastItem + RV_VISIBLE_THRESHOLD) {
-                        Log.i(TAG + ".onScrolled", "Load more requested.");
-                        Log.i(TAG + ".onScrolled", "isLoading = " + isLoading);
-                        if(isLoading) {
-                            Log.i(TAG + ".onScrolled", "previousTotalCount = " + previousTotalCount);
-                            Log.i(TAG + ".onScrolled", "currentTotalCount = " + currentTotalCount);
-
-                            if (previousTotalCount < currentTotalCount) {
-                                Log.i(TAG + ".onScrolled", "Previous job completed.");
-                                isLoading = false;
-                                previousTotalCount = currentTotalCount;
-                            }
-                        }
                         if (!isLoading) {
                             Log.i(TAG + ".onScrolled", "Loading new page.");
                             loadNewPage();
@@ -181,11 +206,13 @@ public class MovieListActivity extends AppCompatActivity
 
             private void loadNewPage() {
                 isLoading = true;
-                pageCount++;
-                Log.i(TAG + ".loadNewPage", "num items increased from " +movieAdapter.getItemCount()
+                Log.i(TAG + ".loadNewPage",
+                        "num items increased from " +movieAdapter.getItemCount()
                         + " to " + (movieAdapter.getItemCount() + 20));
-                Log.i(TAG + ".loadNewPage", "cursor size = " + movieAdapter.getCursorSize());
+                Log.i(TAG + ".loadNewPage",
+                        "cursor size = " + movieAdapter.getCursorSize());
                 if (movieAdapter.getItemCount() < movieAdapter.getCursorSize()) {
+                    pageCount++;
                     rvMoviePosters.post(new Runnable() {
                         public void run() {
                             Log.i(TAG + ".loadNewPage", "setting page count");
@@ -193,9 +220,12 @@ public class MovieListActivity extends AppCompatActivity
                             movieAdapter.notifyDataSetChanged();
                         }
                     });
+                    isLoading = false;
                 } else {
-                    MoviesSyncUtils.getTmdbMovieList(MovieListActivity.this, getQueryUri(), sortBy, pageCount);
-                    makeSortedMovieSearch(getLoaderID());
+                    MoviesSyncUtils.getTmdbMovieList(MovieListActivity.this,
+                            getQueryUri(),
+                            sortBy,
+                            pageCount);
                 }
             }
 
@@ -340,7 +370,8 @@ public class MovieListActivity extends AppCompatActivity
                 }
                 break;
             default:
-                throw new UnsupportedOperationException(getString(R.string.exception_drawer_item_not_implemented));
+                throw new UnsupportedOperationException(
+                        getString(R.string.exception_drawer_item_not_implemented));
         }
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
@@ -350,7 +381,6 @@ public class MovieListActivity extends AppCompatActivity
         rvMoviePosters.scrollToPosition(0);
         pageCount = 1;
         previousTotalCount = 0;
-        isLoading = true;
         Log.i(TAG + ".resetRecyclerView", "setting page count");
         movieAdapter.setPageCount(pageCount);
     }
@@ -451,7 +481,8 @@ public class MovieListActivity extends AppCompatActivity
         etSearchByName.clearFocus();
 //        Utility.hideKeyboard(MainActivity.this, getCurrentFocus().getWindowToken());
         int id = view.getId();
-        Toast.makeText(this, "Movie " + poster.id + " selected.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Movie " + poster.id + " selected.",
+                Toast.LENGTH_SHORT).show();
         switch (id) {
             case R.id.iv_poster:
 //                Intent intent = new Intent(this, MovieDetailActivity.class);

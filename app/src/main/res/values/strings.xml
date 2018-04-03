@@ -26,5 +26,6 @@
     <string name="key_page_number">PAGE_NUMBER_EXTRA</string>
     <string name="exception_drawer_item_not_implemented">Drawer item not implemented</string>
     <string name="loader_not_implemented">Loader not implemented: %1$d</string>
+    <string name="key_sync_success">event.sync.success</string>
 
 </resources>
