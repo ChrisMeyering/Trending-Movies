@@ -25,7 +25,7 @@ android {
 }
 
 ext {
-    supportLibraryVersion = '27.1.0'
+    supportLibraryVersion = '27.1.1'
     retrofitLibraryVersion = '2.3.0'
     buterknifeLibraryVersion = '8.8.1'
 }
@@ -34,12 +34,14 @@ ext {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
+    implementation "com.android.support:exifinterface:$supportLibraryVersion"
     implementation "com.android.support:support-v4:$supportLibraryVersion"
     implementation "com.android.support:design:$supportLibraryVersion"
     implementation "com.android.support.constraint:constraint-layout:1.0.2"
     implementation 'com.google.code.gson:gson:2.8.0'
     implementation "com.squareup.retrofit2:retrofit:$retrofitLibraryVersion"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitLibraryVersion"
+    debugImplementation "com.squareup.okhttp3:logging-interceptor:3.10.0"
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation "com.jakewharton:butterknife:$buterknifeLibraryVersion"
     annotationProcessor "com.jakewharton:butterknife-compiler:$buterknifeLibraryVersion"

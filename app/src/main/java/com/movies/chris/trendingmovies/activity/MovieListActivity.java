@@ -63,11 +63,9 @@ public class MovieListActivity extends AppCompatActivity
     private static final String SORT_RECENT = MoviesContract.PATH_RECENT;
 
     private boolean isLoading = false;
-    private int previousTotalCount = 0;
     private String sortBy = SORT_BY_RATING;
-    private int pageCount = 1;
     private MovieListAdapter movieAdapter;
-    private final int RV_VISIBLE_THRESHOLD = 7;
+    static final int RV_VISIBLE_THRESHOLD = 7;
     @BindView(R.id.rv_movie_posters)
     RecyclerView rvMoviePosters;
     @BindView(R.id.pb_loading_movie_list)
@@ -83,18 +81,72 @@ public class MovieListActivity extends AppCompatActivity
     @BindView(R.id.et_search_by_name)
     EditText etSearchByName;
 
+    private RecyclerView.OnScrollListener rvScrollListener = new RecyclerView.OnScrollListener() {
+        @Override
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            super.onScrollStateChanged(recyclerView, newState);
+            if (!recyclerView.canScrollVertically(1) && !isLoading) {
+                Log.i(TAG, "bottom reached, loading more");
+                loadNewPage();
+            }
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+            if (!isLoading) {
+                GridLayoutManager layoutManager =
+                        (GridLayoutManager) rvMoviePosters.getLayoutManager();
+                int lastItem = layoutManager.findLastCompletelyVisibleItemPosition();
+                int currentTotalCount = layoutManager.getItemCount();
+                if ((dx == 0 && dy == 0)
+                        || (recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_SETTLING))
+                    return;
+                if (dy > 0) {
+                    if (currentTotalCount <= lastItem + RV_VISIBLE_THRESHOLD) {
+                        Log.i(TAG, "visible threshold reached, loading more");
+                        loadNewPage();
+                    }
+                }
+            }
+        }
+
+        synchronized void loadNewPage() {
+            switch (sortBy) {
+                case SORT_FAVORITES:
+                case SORT_RECENT:
+                    break;
+                case SORT_UPCOMING:
+                case SORT_NOW_PLAYING:
+                    if (movieAdapter.getItemCount() >= 100)
+                        break;
+                case SORT_BY_POPULARITY:
+                case SORT_BY_RATING:
+                    isLoading = true;
+                    Log.i(TAG, "new query: \n" + getQueryUri() + "\n page number = " + movieAdapter.getItemCount() / 20
+                            + "\n number of elements in adapter = " + movieAdapter.getItemCount());
+                    MoviesSyncUtils.getTmdbMovieList(MovieListActivity.this,
+                            getQueryUri(),
+                            sortBy,
+                            movieAdapter.getNextPageNumber());
+                    break;
+            }
+        }
+
+    };
+
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            isLoading = false;
             if (intent.getBooleanExtra(getString(R.string.key_sync_success), false)) {
                 Log.i(TAG, "Sync successful");
-                pageCount++;
-                makeSortedMovieSearch(getLoaderID());
+                movieAdapter.notifyDataSetChanged();
+//                makeSortedMovieSearch(getLoaderID());
 
             } else {
                 Log.i(TAG, "Error: Sync failed");
             }
+            isLoading = false;
         }
     };
 
@@ -179,57 +231,14 @@ public class MovieListActivity extends AppCompatActivity
         rvMoviePosters.setItemViewCacheSize(30);
         rvMoviePosters.setDrawingCacheEnabled(true);
 //        rvMoviePosters.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-        movieAdapter = new MovieListAdapter(this, this, pageCount);
+        movieAdapter = new MovieListAdapter(this, this);
         rvMoviePosters.setAdapter(movieAdapter);
         final RecyclerView.LayoutManager layoutManager =
                 new GridLayoutManager(this, 2);
         //TODO: Utility.numOfGridColumns(this));
         rvMoviePosters.setLayoutManager(layoutManager);
         layoutManager.setAutoMeasureEnabled(true);
-        rvMoviePosters.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if(dy >= 0) {
-                    GridLayoutManager layoutManager =
-                            (GridLayoutManager)rvMoviePosters.getLayoutManager();
-                    int lastItem = layoutManager.findLastCompletelyVisibleItemPosition();
-                    int currentTotalCount = layoutManager.getItemCount();
-                    if (currentTotalCount <= lastItem + RV_VISIBLE_THRESHOLD) {
-                        if (!isLoading) {
-                            Log.i(TAG + ".onScrolled", "Loading new page.");
-                            loadNewPage();
-                        }
-                    }
-                }
-            }
-
-            private void loadNewPage() {
-                isLoading = true;
-                Log.i(TAG + ".loadNewPage",
-                        "num items increased from " +movieAdapter.getItemCount()
-                        + " to " + (movieAdapter.getItemCount() + 20));
-                Log.i(TAG + ".loadNewPage",
-                        "cursor size = " + movieAdapter.getCursorSize());
-                if (movieAdapter.getItemCount() < movieAdapter.getCursorSize()) {
-                    pageCount++;
-                    rvMoviePosters.post(new Runnable() {
-                        public void run() {
-                            Log.i(TAG + ".loadNewPage", "setting page count");
-                            movieAdapter.setPageCount(pageCount);
-                            movieAdapter.notifyDataSetChanged();
-                        }
-                    });
-                    isLoading = false;
-                } else {
-                    MoviesSyncUtils.getTmdbMovieList(MovieListActivity.this,
-                            getQueryUri(),
-                            sortBy,
-                            pageCount);
-                }
-            }
-
-        });
+        rvMoviePosters.addOnScrollListener(rvScrollListener);
 //        rvMoviePosters.setOnTouchListener(new RecyclerView.OnTouchListener() {
 //            @Override
 //            public boolean onTouch(View v, MotionEvent event) {
@@ -379,10 +388,7 @@ public class MovieListActivity extends AppCompatActivity
 
     private void resetRecyclerView() {
         rvMoviePosters.scrollToPosition(0);
-        pageCount = 1;
-        previousTotalCount = 0;
         Log.i(TAG + ".resetRecyclerView", "setting page count");
-        movieAdapter.setPageCount(pageCount);
     }
 
 
@@ -433,7 +439,18 @@ public class MovieListActivity extends AppCompatActivity
             Log.i(TAG + ".onLoadFinished", "data not null");
             switch (loader.getId()) {
                 case LOADER_FAVORITES_ID:
+                    if (sortBy.equals(SORT_FAVORITES)) {
+                        data.setNotificationUri(getContentResolver(), getQueryUri());
+                        movieAdapter.swapCursor(data);
+                    } else {
+                        movieAdapter.setFavorites(data);
+                    }
+                    break;
                 case LOADER_RECENTS_ID:
+                    if (sortBy.equals(SORT_RECENT)) {
+                        data.setNotificationUri(getContentResolver(), getQueryUri());
+                        movieAdapter.swapCursor(data);
+                    }
                     break;
                 default:
                     if (data.getCount() == 0) {
@@ -458,9 +475,6 @@ public class MovieListActivity extends AppCompatActivity
 //                      showPosters();
                         data.setNotificationUri(getContentResolver(), getQueryUri());
                         movieAdapter.swapCursor(data);
-                        Log.i(TAG + ".onLoadFinished", "setting page count");
-                        movieAdapter.setPageCount(pageCount);
-                        movieAdapter.notifyDataSetChanged();
 
                     }
                     break;

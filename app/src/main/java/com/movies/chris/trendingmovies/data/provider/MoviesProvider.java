@@ -112,9 +112,15 @@ public class MoviesProvider extends ContentProvider {
     @Override
     public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        Log.i(TAG, "\n**********************\n" +
+                "Inserting new movies:\n" +
+                "**********************");
         String tableName = getTableName(uri);
         int rowsInserted = 0;
         db.beginTransaction();
+        for (ContentValues value:values) {
+            Log.i(TAG, value.toString());
+        }
         try {
             for (ContentValues value : values) {
                 long _id = db.insert(tableName, null, value);

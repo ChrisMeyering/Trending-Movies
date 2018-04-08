@@ -3,6 +3,7 @@ package com.movies.chris.trendingmovies.data.tmdb.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
@@ -68,14 +69,17 @@ public class MovieList implements Parcelable
     public int getSize() {
         return moviePosters.size();
     }
-    public void save(Context context, Uri uri) {
-        if (context.getContentResolver() != null) {
+
+    public int save(Context context, Uri uri) {
+        ContentResolver contentResolver = context.getContentResolver();
+        if (contentResolver != null) {
             try {
-                context.getContentResolver().bulkInsert(uri, getPosterListContentValues());
+                return contentResolver.bulkInsert(uri, getPosterListContentValues());
             } catch (Exception e) {
                 Log.i("MovieList.save", "failed to save " + uri.toString());
             }
         }
+        return -1;
     }
     public int describeContents() {
         return  0;

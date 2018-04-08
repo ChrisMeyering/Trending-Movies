@@ -32,9 +32,9 @@ import butterknife.ButterKnife;
 public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.PosterViewHolder> {
     private static final String TAG = MovieListAdapter.class.getSimpleName();
     private static final int ITEMS_PER_PAGE = 20;
-    private int pageCount = 0;
 
     private Cursor moviePosters;
+    private Cursor favorites = null;
     private final Context context;
     private final MovieAdapterClickHandler clickHandler;
     private ArrayList<Integer> favoriteIds = new ArrayList<>();
@@ -43,18 +43,22 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
         this.favoriteIds = favoriteIds;
     }
 
-    public int getCursorSize() {
-        return moviePosters.getCount();
+    public int getNextPageNumber() {
+        return 1 + (getItemCount() /ITEMS_PER_PAGE);
+    }
+
+    public void setFavorites(Cursor favorites) {
+        this.favorites = favorites;
+        notifyDataSetChanged();
     }
 
     public interface MovieAdapterClickHandler {
         void onClick(View view, MoviePoster poster);
     }
 
-    public MovieListAdapter(Context context, MovieAdapterClickHandler clickHandler, int pageCount) {
+    public MovieListAdapter(Context context, MovieAdapterClickHandler clickHandler) {
         this.context = context;
         this.clickHandler = clickHandler;
-        this.pageCount = pageCount;
     }
 
     @NonNull
@@ -79,9 +83,11 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
     }
 
     private boolean isFavorite(int movieId) {
-        for (int id : favoriteIds) {
-            if (movieId == id)
-                return true;
+        if (favorites != null) {
+            for (favorites.moveToFirst(); !favorites.isAfterLast(); favorites.moveToNext()) {
+                if (favorites.getInt(moviePosters.getColumnIndex(MoviesContract.MOVIE_ID)) == movieId)
+                    return true;
+            }
         }
         return false;
     }
@@ -89,8 +95,9 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
     @Override
     public int getItemCount() {
         if (moviePosters == null) return 0;
-        return (moviePosters.getCount() > pageCount*ITEMS_PER_PAGE) ?
-                pageCount * ITEMS_PER_PAGE: moviePosters.getCount();
+        return moviePosters.getCount();
+//        return (moviePosters.getCount() > pageCount*ITEMS_PER_PAGE) ?
+//                pageCount * ITEMS_PER_PAGE: moviePosters.getCount();
     }
 
     public class PosterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -105,6 +112,8 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
             super(view);
             ButterKnife.bind(this, view);
             view.measure(View.MeasureSpec.UNSPECIFIED,View.MeasureSpec.UNSPECIFIED);
+            ivPoster.setOnClickListener(this);
+            ibFavorite.setOnClickListener(this);
             width = MediaUtils.measureWidth(view);
 
         }
@@ -150,12 +159,10 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
                             });
         }
     }
-    public void setPageCount(int pageCount) {
-        Log.i(TAG + ".setPageCount","pageCount = " + pageCount);
-        this.pageCount = pageCount;
-    }
+
     public void swapCursor(Cursor data) {
         moviePosters = data;
+        notifyDataSetChanged();
     }
 
 }

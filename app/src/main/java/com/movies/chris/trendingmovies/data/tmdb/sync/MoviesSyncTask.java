@@ -32,32 +32,32 @@ public class MoviesSyncTask {
             call.enqueue(new Callback<MovieList>() {
                              @Override
                              public void onResponse(Call<MovieList> call, Response<MovieList> response) {
-                                 Intent intent = new Intent(EVENT_SYNC_COMPLETE);
                                  MovieList movieList = response.body();
                                  if (movieList != null) {
                                      Log.i(TAG + ".onResponse", "Number of posters = " + movieList.getSize());
-                                     movieList.save(context, uri);
-                                     intent.putExtra(context.getResources()
-                                                     .getString(R.string.key_sync_success),
-                                             true);
-                                     LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+                                     try {
+                                         int numItemsAdded = movieList.save(context, uri);
+                                         broadcastExitStatus(numItemsAdded == 20);
+                                     } catch (Exception e) {
+                                         broadcastExitStatus(false);
+                                     }
                                  } else {
                                      Log.i(TAG + ".onResponse", "null response");
-                                     intent.putExtra(context.getResources()
-                                                     .getString(R.string.key_sync_success),
-                                             false);
+                                     broadcastExitStatus(false);
                                  }
                              }
 
                              @Override
                              public void onFailure(Call<MovieList> call, Throwable t) {
                                  t.printStackTrace();
+                                 broadcastExitStatus(false);
+                             }
+
+                             private void broadcastExitStatus(boolean success) {
                                  Intent intent = new Intent(EVENT_SYNC_COMPLETE);
                                  intent.putExtra(context.getResources()
-                                                 .getString(R.string.key_sync_success),
-                                         false);
+                                                 .getString(R.string.key_sync_success), success);
                                  LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-
                              }
                          });
     }
