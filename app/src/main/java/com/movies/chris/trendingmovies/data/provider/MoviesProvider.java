@@ -21,11 +21,12 @@ public class MoviesProvider extends ContentProvider {
     public static final int CODE_FAVORITES = 100;
     public static final int CODE_FAVORITES_WITH_ID = 101;
     public static final int CODE_RECENT = 200;
+    public static final int CODE_RECENT_WITH_ID = 201;
     public static final int CODE_TOP_RATED = 300;
     public static final int CODE_POPULAR = 400;
     public static final int CODE_NOW_PLAYING = 500;
     public static final int CODE_UPCOMING = 600;
-
+    public static final int CODE_MOVIE_NAME = 700;
     public static final int CODE_GENRE_IDS = 800;
     public static final int CODE_GENRE_IDS_WITH_ID = 801;
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -38,6 +39,7 @@ public class MoviesProvider extends ContentProvider {
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_FAVORITES + "/#", CODE_FAVORITES_WITH_ID);
 
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_RECENT, CODE_RECENT);
+        matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_RECENT + "/#", CODE_RECENT_WITH_ID);
 
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_TOP_RATED, CODE_TOP_RATED);
 
@@ -46,6 +48,8 @@ public class MoviesProvider extends ContentProvider {
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_NOW_PLAYING, CODE_NOW_PLAYING);
 
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_UPCOMING, CODE_UPCOMING);
+
+        matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_MOVIE_NAME, CODE_MOVIE_NAME);
 
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_GENRE_IDS, CODE_GENRE_IDS);
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_GENRE_IDS + "/#", CODE_GENRE_IDS_WITH_ID);
@@ -100,7 +104,10 @@ public class MoviesProvider extends ContentProvider {
             case CODE_FAVORITES_WITH_ID:
                 return MoviesContract.FavoritesEntry.TABLE_NAME;
             case CODE_RECENT:
+            case CODE_RECENT_WITH_ID:
                 return MoviesContract.RecentEntry.TABLE_NAME;
+            case CODE_MOVIE_NAME:
+                return MoviesContract.MovieNameEntry.TABLE_NAME;
             case CODE_GENRE_IDS:
             case CODE_GENRE_IDS_WITH_ID:
                 return MoviesContract.GenreIdsEntry.TABLE_NAME;
@@ -172,6 +179,13 @@ public class MoviesProvider extends ContentProvider {
                 numRowsDeleted = mOpenHelper.getWritableDatabase()
                         .delete(tableName,
                                 MoviesContract.FavoritesEntry.getWhereClause(),
+                                selectionArguments);
+                break;
+            case CODE_RECENT_WITH_ID:
+                selectionArguments = new String[]{uri.getLastPathSegment()};
+                numRowsDeleted = mOpenHelper.getWritableDatabase()
+                        .delete(tableName,
+                                MoviesContract.RecentEntry.getWhereClause(),
                                 selectionArguments);
                 break;
             default:

@@ -10,6 +10,11 @@
 
     <string name="img_desc_poster">Image View Poster</string>
 
+    <!--SaveInstanceState keys -->
+    <string name="state_key_movie_name_search">movie_search_query_key</string>
+    <string name="state_key_layout_manager">layout_manager_key</string>
+    <!--SharedPreferences keys -->
+    <string name="pref_key_sort_by">.MovieListActivity.sortBy</string>
     <!--Drawer Layout Actions-->
     <string name="action_top_rated">Top Rated</string>
     <string name="action_most_popular">Most Popular</string>

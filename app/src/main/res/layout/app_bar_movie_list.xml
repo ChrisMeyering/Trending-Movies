@@ -30,7 +30,7 @@
                 android:layout_gravity="center"
                 android:focusedByDefault="false"
                 android:hint="@string/search"
-                android:imeOptions="actionDone"
+                android:imeOptions="actionSearch"
                 android:inputType="textCapWords"
                 android:maxLines="1" />
         </android.support.v7.widget.Toolbar>

@@ -3,6 +3,7 @@ package com.movies.chris.trendingmovies.data.provider;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Movie;
 
 import java.util.ArrayList;
 
@@ -55,6 +56,11 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
                         + MoviesContract.GenreIdsEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                         + MoviesContract.GenreIdsEntry.COLUMN_GENRE_ID + " INTEGER NOT NULL UNIQUE, "
                         + MoviesContract.GenreIdsEntry.COLUMN_GENRE_NAME + " STRING NOT NULL);";
+        final String SQL_CREATE_MOVIE_NAME_TABLE =
+                "CREATE TABLE " + MoviesContract.MovieNameEntry.TABLE_NAME + " ("
+                        + MoviesContract.MovieNameEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        + MoviesContract.MovieNameEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL UNIQUE, "
+                        + MoviesContract.MovieNameEntry.COLUMN_POSTER_PATH + " STRING);";
 
         ArrayList<String> SQLInstructions = new ArrayList<>();
         SQLInstructions.add(SQL_CREATE_FAVORITES_TABLE);
@@ -64,6 +70,7 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
         SQLInstructions.add(SQL_CREATE_UPCOMING_TABLE);
         SQLInstructions.add(SQL_CREATE_NOW_PLAYING_TABLE);
         SQLInstructions.add(SQL_CREATE_GENRE_IDS_TABLE);
+        SQLInstructions.add(SQL_CREATE_MOVIE_NAME_TABLE);
 
         return SQLInstructions;
     }
@@ -83,6 +90,7 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + MoviesContract.MostPopularEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + MoviesContract.UpcomingEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + MoviesContract.NowPlayingEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + MoviesContract.MovieNameEntry.TABLE_NAME);
         onCreate(db);
     }
 }

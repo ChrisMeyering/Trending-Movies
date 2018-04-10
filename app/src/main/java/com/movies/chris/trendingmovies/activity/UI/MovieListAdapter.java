@@ -1,10 +1,9 @@
-package com.movies.chris.trendingmovies.UI;
+package com.movies.chris.trendingmovies.activity.UI;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,14 +12,11 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.movies.chris.trendingmovies.R;
-import com.movies.chris.trendingmovies.activity.MovieListActivity;
 import com.movies.chris.trendingmovies.data.provider.MoviesContract;
 import com.movies.chris.trendingmovies.data.tmdb.model.MoviePoster;
 import com.movies.chris.trendingmovies.utils.MediaUtils;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-
-import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -34,23 +30,19 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
     private static final int ITEMS_PER_PAGE = 20;
 
     private Cursor moviePosters;
-    private Cursor favorites = null;
+//    private Cursor favorites = null;
     private final Context context;
     private final MovieAdapterClickHandler clickHandler;
-    private ArrayList<Integer> favoriteIds = new ArrayList<>();
-
-    public void updateFavorites(ArrayList<Integer> favoriteIds) {
-        this.favoriteIds = favoriteIds;
-    }
 
     public int getNextPageNumber() {
         return 1 + (getItemCount() /ITEMS_PER_PAGE);
     }
 
-    public void setFavorites(Cursor favorites) {
-        this.favorites = favorites;
-        notifyDataSetChanged();
-    }
+//    public void setFavorites(Cursor favorites) {
+//        this.favorites = favorites;
+//        if (favorites != null)
+//            notifyDataSetChanged();
+//    }
 
     public interface MovieAdapterClickHandler {
         void onClick(View view, MoviePoster poster);
@@ -68,12 +60,6 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
         return new PosterViewHolder(view);
     }
 
-    //    @Override
-//    public PosterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-//        View view = LayoutInflater.from(context).inflate(R.layout.movie_list_item, parent, false);
-//        return new PosterViewHolder(view);
-//    }
-
     @Override
     public void onBindViewHolder(@NonNull PosterViewHolder holder, int position) {
         if (!moviePosters.isClosed()) {
@@ -82,22 +68,19 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
         }
     }
 
-    private boolean isFavorite(int movieId) {
-        if (favorites != null) {
-            for (favorites.moveToFirst(); !favorites.isAfterLast(); favorites.moveToNext()) {
-                if (favorites.getInt(moviePosters.getColumnIndex(MoviesContract.MOVIE_ID)) == movieId)
-                    return true;
-            }
-        }
-        return false;
-    }
+//    private boolean isFavorite(int movieId) {
+//        if (favorites != null) {
+//            for (favorites.moveToFirst(); !favorites.isAfterLast(); favorites.moveToNext()) {
+//                if (favorites.getInt(moviePosters.getColumnIndex(MoviesContract.MOVIE_ID)) == movieId)
+//                    return true;
+//            }
+//        }
+//        return false;
+//    }
 
     @Override
     public int getItemCount() {
-        if (moviePosters == null) return 0;
-        return moviePosters.getCount();
-//        return (moviePosters.getCount() > pageCount*ITEMS_PER_PAGE) ?
-//                pageCount * ITEMS_PER_PAGE: moviePosters.getCount();
+        return (moviePosters == null) ? 0 : moviePosters.getCount();
     }
 
     public class PosterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -121,22 +104,29 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
         @Override
         public void onClick(View view) {
             moviePosters.moveToPosition(getAdapterPosition());
+            MoviePoster poster = MoviePoster.getPoster(moviePosters);
             if (view.getId() == R.id.ib_favorite) {
-                if (isFavorite(moviePosters.getInt(moviePosters.getColumnIndex(MoviesContract.MOVIE_ID))))
+                if (poster.isFavorite(context)) {
                     ibFavorite.setImageResource(R.drawable.ic_star_border_grey_600_24dp);
-                else
+                    poster.deleteFromFavorites(context);
+                }
+                else {
                     ibFavorite.setImageResource(R.drawable.ic_star_orange_500_24dp);
+                    poster.saveToFavorites(context);
+                }
+            } else {
+                if (poster.isRecent(context))
+                    poster.deleteFromRecents(context);
+                poster.saveToRecents(context);
+                clickHandler.onClick(view, poster);
             }
-            MoviePoster poster = new MoviePoster(
-                    moviePosters.getInt(moviePosters.getColumnIndex(MoviesContract.MOVIE_ID)),
-                    moviePosters.getString(moviePosters.getColumnIndex(MoviesContract.POSTER_PATH)));
-            clickHandler.onClick(view, poster);
         }
 
         private void bind() {
             int movieId = moviePosters.getInt(moviePosters.getColumnIndex(MoviesContract.MOVIE_ID));
             String posterPath = moviePosters.getString(moviePosters.getColumnIndex(MoviesContract.POSTER_PATH));
-            if (isFavorite(movieId)) {
+//            if (favorites == null || MoviePoster.isFavorite(context, moviePosters)) {
+            if (MoviePoster.isFavorite(context, moviePosters)) {
                 ibFavorite.setImageResource(R.drawable.ic_star_orange_500_24dp);
             } else {
                 ibFavorite.setImageResource(R.drawable.ic_star_border_grey_600_24dp);
@@ -150,7 +140,6 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
                                 public void onSuccess() {
                                     pbLoadingPoster.setVisibility(View.INVISIBLE);
                                 }
-
                                 @Override
                                 public void onError(Exception e) {
                                     e.printStackTrace();

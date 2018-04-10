@@ -17,7 +17,7 @@ public class MoviesContract {
     public static final String PATH_POPULAR = "popular";
     public static final String PATH_UPCOMING = "upcoming";
     public static final String PATH_NOW_PLAYING = "now_playing";
-
+    public static final String PATH_MOVIE_NAME = "movie_name";
     public static final String PATH_GENRE_IDS = "genre_ids";
 
     public static final String MOVIE_ID = "movie_id";
@@ -41,54 +41,6 @@ public class MoviesContract {
             return new String[] {name};
         }
     }
-
-//
-//    public static final class MovieDetailEntry implements BaseColumns {
-//        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
-//                .appendPath(PATH_NOW_PLAYING)
-//                .build();
-//
-//        public static final String TABLE_NAME = PATH_MOVIES;
-//        public static final String COLUMN_MOVIE_ID = MOVIE_ID;
-//        public static final String COLUMN_POSTER_PATH = POSTER_PATH;
-//        public static final String COLUMN_TITLE = "title";
-//        public static final String COLUMN_BACKDROP_PATH = "backdrop_path";
-//        public static final String COLUMN_OVERVIEW = "overview";
-//        public static final String COLUMN_GENRE_ID = "genre_ids";
-//        public static final String COLUMN_GENRE_NAMES = "genre_names";
-//        public static final String COLUMN_RELEASE_DATE = "release_date";
-//        public static final String COLUMN_VOTE_AVERAGE = "vote_average";
-//        public static final String COLUMN_HOMEPAGE = "homepage";
-//        public static final String COLUMN_POPULARITY = "popularity";
-//        public static final String COLUMN_RUNTIME = "runtime";
-//        public static final String COLUMN_TAGLINE = "tagline";
-//        public static Uri buildMovieUriWithID(int id) {
-//            return CONTENT_URI.buildUpon().appendPath(String.valueOf(id)).build();
-//        }
-//
-//        public static String[] getProjection(){
-//                return new String[]{COLUMN_MOVIE_ID, COLUMN_POSTER_PATH, COLUMN_TITLE,
-//                        COLUMN_BACKDROP_PATH, COLUMN_OVERVIEW, COLUMN_GENRE_NAMES,
-//                        COLUMN_RELEASE_DATE, COLUMN_VOTE_AVERAGE,
-//                };
-//        }
-//
-//        public static String getMovieListSelection(String sortBy) {
-//            return sortBy + " <= ?";
-//        }
-//        public static String[] getMovieListSelectionArgs(int pageNumber) {return new String[]{String.valueOf(pageNumber)};}
-//        public static String getMovieListSortOder(String sort_order, int limit, int offset) {
-//            String limitOffset = " LIMIT " + String.valueOf(limit) + " OFFSET " + String.valueOf(offset);
-//            return (sort_order.isEmpty()) ? limitOffset :sort_order + limitOffset;
-//        }
-//
-//        public static String getMovieListSortOder(String sort_order, int limit) {
-//            String limitSring = " LIMIT " + String.valueOf(limit);
-//            return (sort_order.isEmpty()) ? limitSring :sort_order + limitSring;
-//        }
-//    }
-//
-//
 
     public static final class NowPlayingEntry implements BaseColumns {
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
@@ -163,8 +115,25 @@ public class MoviesContract {
         public static final String COLUMN_POSTER_PATH = POSTER_PATH;
         public static final String COLUMN_TITLE = TITLE;
 
+        public static String getRecentsWithIdSelection() { return COLUMN_MOVIE_ID + " = ?";}
+        public static String[] getRecentsWithIdSelectionArgs(int movieId) {
+            return new String[] {String.valueOf(movieId)};
+        }
         public static String getSortOrder() {
             return _ID + " DESC";
         }
+        public static String getWhereClause() {
+            return COLUMN_MOVIE_ID + " = ?";
+        }
+
+    }
+    public static final class MovieNameEntry implements BaseColumns {
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
+                .appendPath(PATH_MOVIE_NAME)
+                .build();
+        public static final String TABLE_NAME = PATH_MOVIE_NAME;
+        public static final String COLUMN_MOVIE_ID = MOVIE_ID;
+        public static final String COLUMN_POSTER_PATH = POSTER_PATH;
+        public static final String COLUMN_TITLE = TITLE;
     }
 }
