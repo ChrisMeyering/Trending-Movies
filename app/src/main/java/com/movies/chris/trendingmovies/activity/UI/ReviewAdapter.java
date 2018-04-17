@@ -7,7 +7,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.chris.popularMovies2.R;
+import com.movies.chris.trendingmovies.R;
+import com.movies.chris.trendingmovies.data.tmdb.model.detail.Review;
+
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Created by chris on 11/7/17.
@@ -15,7 +21,7 @@ import com.example.chris.popularMovies2.R;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder> {
     private Context context;
-    private MovieReview[] reviews = null;
+    private List<Review> reviews = null;
 
     public ReviewAdapter(Context context) {
         this.context = context;
@@ -29,31 +35,34 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
 
     @Override
     public void onBindViewHolder(ReviewAdapter.ReviewViewHolder holder, int position) {
-        MovieReview movieReview = reviews[position];
-        holder.tvAuthor.setText(movieReview.getAuthor());
-        holder.tvReview.setText(movieReview.getReview());
+        holder.bind(reviews.get(position));
 
     }
 
     @Override
     public int getItemCount() {
         if (reviews == null) return 0;
-        else return reviews.length;
+        else return reviews.size();
     }
 
-    public void updateData(MovieReview[] movieReviews) {
-        reviews = movieReviews;
+    public void updateData(List<Review> reviews) {
+        this.reviews = reviews;
         notifyDataSetChanged();
     }
 
     public class ReviewViewHolder extends RecyclerView.ViewHolder {
-        private final TextView tvAuthor;
-        private final TextView tvReview;
+        @BindView(R.id.tv_review_author)
+        TextView tvAuthor;
+        @BindView(R.id.tv_review_contents)
+        TextView tvReview;
 
         public ReviewViewHolder(View itemView) {
             super(itemView);
-            tvAuthor = itemView.findViewById(R.id.tv_review_author);
-            tvReview = itemView.findViewById(R.id.tv_review_contents);
+            ButterKnife.bind(this, itemView);
+        }
+        public void bind(Review review){
+            tvAuthor.setText(review.getAuthor());
+            tvReview.setText(review.getContent());
         }
     }
 }

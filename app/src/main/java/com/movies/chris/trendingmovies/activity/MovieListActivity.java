@@ -11,24 +11,24 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -39,6 +39,7 @@ import com.movies.chris.trendingmovies.R;
 import com.movies.chris.trendingmovies.activity.UI.MovieListAdapter;
 import com.movies.chris.trendingmovies.activity.UI.Utility;
 import com.movies.chris.trendingmovies.data.provider.MoviesContract;
+import com.movies.chris.trendingmovies.data.tmdb.model.detail.MovieDetail;
 import com.movies.chris.trendingmovies.data.tmdb.model.list.MoviePoster;
 import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncTask;
 import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncUtils;
@@ -147,13 +148,25 @@ public class MovieListActivity extends AppCompatActivity
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getBooleanExtra(getString(R.string.key_sync_success), false)) {
-                Log.i(TAG, "Sync successful");
-                movieAdapter.notifyDataSetChanged();
-            } else {
-                Log.i(TAG, "Error: Sync failed");
+            if (intent.getAction() != null)
+            switch (intent.getAction()) {
+                case MoviesSyncTask.EVENT_SYNC_COMPLETE:
+                    if (intent.getBooleanExtra(getString(R.string.key_sync_success), false)) {
+                        Log.i(TAG, "Sync successful");
+                        movieAdapter.notifyDataSetChanged();
+                    } else {
+                        Log.i(TAG, "Error: Sync failed");
+                    }
+                    isLoading = false;
+                    break;
+                case MoviesSyncTask.EVENT_MOVIE_DETAIL_RECEIVED:
+                    if (intent.hasExtra(getString(R.string.key_movie_detail))) {
+                        MovieDetail movieDetail = intent.getParcelableExtra(getString(R.string.key_movie_detail));
+                        Intent detailIntent = new Intent(MovieListActivity.this, MovieDetailActivity.class);
+                        detailIntent.putExtra(getString(R.string.key_movie_detail), movieDetail);
+                        startActivity(detailIntent);
+                    }
             }
-            isLoading = false;
         }
     };
 
@@ -176,8 +189,11 @@ public class MovieListActivity extends AppCompatActivity
 
     @Override
     protected void onResume() {
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver,
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.registerReceiver(receiver,
                 new IntentFilter(MoviesSyncTask.EVENT_SYNC_COMPLETE));
+        localBroadcastManager.registerReceiver(receiver,
+                new IntentFilter(MoviesSyncTask.EVENT_MOVIE_DETAIL_RECEIVED));
         super.onResume();
     }
 
@@ -281,7 +297,7 @@ public class MovieListActivity extends AppCompatActivity
         rvMoviePosters.setItemViewCacheSize(30);
         rvMoviePosters.setDrawingCacheEnabled(true);
 //        rvMoviePosters.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-        movieAdapter = new MovieListAdapter(this, this);
+        movieAdapter = new MovieListAdapter(this);
         rvMoviePosters.setAdapter(movieAdapter);
         final RecyclerView.LayoutManager layoutManager =
                 new GridLayoutManager(this, Utility.numOfGridColumns(this));
@@ -524,9 +540,7 @@ public class MovieListActivity extends AppCompatActivity
                 Toast.LENGTH_SHORT).show();
         switch (viewId) {
             case R.id.iv_poster:
-                Intent intent = new Intent(this, MovieDetailActivity.class);
-                intent.putExtra(getString(R.string.key_movie_id), poster.id);
-//                startActivity(intent);
+                MoviesSyncUtils.getTmdbMovieDetail(this, poster.id);
                 break;
 //            case R.id.ib_favorite:
 //                if (poster.isFavorite(this)) {

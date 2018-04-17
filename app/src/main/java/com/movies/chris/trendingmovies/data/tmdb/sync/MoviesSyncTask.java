@@ -7,7 +7,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
-
 import com.movies.chris.trendingmovies.R;
 import com.movies.chris.trendingmovies.data.provider.MoviesContract;
 import com.movies.chris.trendingmovies.data.tmdb.model.detail.MovieDetail;
@@ -24,9 +23,9 @@ import retrofit2.Response;
  */
 
 public class MoviesSyncTask {
-    private static String TAG = MoviesSyncTask.class.getSimpleName();
-    public static String EVENT_SYNC_COMPLETE = "com.movies.chris.trendingmovies.data.tmbd.sync.SYNC_COMPLETE";
-    public static String EVENT_MOVIE_DETAIL_RECEIVED = "com.movies.chris.trendingmovies.data.tmbd.sync.MOVIE_DETAIL_RECEIVED";
+    private static final String TAG = MoviesSyncTask.class.getSimpleName();
+    public static final String EVENT_SYNC_COMPLETE = "com.movies.chris.trendingmovies.data.tmbd.sync.SYNC_COMPLETE";
+    public static final String EVENT_MOVIE_DETAIL_RECEIVED = "com.movies.chris.trendingmovies.data.tmbd.sync.MOVIE_DETAIL_RECEIVED";
 
     public static void getMovieDetail(final Context context, final int movieID) {
         MovieApiInterface movieApiInterface = ApiUtils.getMovieApiInterface();

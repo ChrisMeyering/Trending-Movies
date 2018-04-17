@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import com.movies.chris.trendingmovies.data.provider.MoviesContract;
-import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncUtils;
 
 public class MovieUtils {
 

@@ -3,7 +3,6 @@ package com.movies.chris.trendingmovies.data.provider;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Movie;
 
 import java.util.ArrayList;
 

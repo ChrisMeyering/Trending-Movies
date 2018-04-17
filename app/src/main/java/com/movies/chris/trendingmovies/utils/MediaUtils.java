@@ -1,18 +1,7 @@
 package com.movies.chris.trendingmovies.utils;
 
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.view.View;
-
-import com.movies.chris.trendingmovies.BuildConfig;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Scanner;
 
 /**
  * Created by chris on 10/23/17.

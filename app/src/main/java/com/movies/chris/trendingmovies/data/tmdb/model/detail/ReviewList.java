@@ -1,12 +1,14 @@
 
 package com.movies.chris.trendingmovies.data.tmdb.model.detail;
 
-import java.util.List;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReviewList implements Parcelable
 {
@@ -32,6 +34,7 @@ public class ReviewList implements Parcelable
     ;
 
     protected ReviewList(Parcel in) {
+        this.reviews = new ArrayList<>();
         in.readList(this.reviews, (Review.class.getClassLoader()));
     }
 

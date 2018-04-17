@@ -1,17 +1,21 @@
 package com.movies.chris.trendingmovies.activity.UI;
 
 import android.content.Context;
-import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 
-import com.example.chris.popularMovies2.R;
-import com.example.chris.popularMovies2.databinding.TrailerListItemBinding;
+import com.movies.chris.trendingmovies.R;
+import com.movies.chris.trendingmovies.utils.MediaUtils;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Created by chris on 11/11/17.
@@ -58,34 +62,43 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
         void watchTrailer(String trailerKey);
     }
 
-    public TrailerAdapter(Context context, TrailerAdapterClickHandler clickHandler) {
+    public TrailerAdapter(Context context) {
         this.context = context;
-        this.clickHandler = clickHandler;
+        try {
+            clickHandler = (TrailerAdapterClickHandler) context;
+        } catch (ClassCastException e){
+            throw new ClassCastException(context.toString()
+                    + " must implement TrailerAdapterClickHandler");
+        }
     }
 
 
     public class TrailerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private TrailerListItemBinding binding;
+        @BindView(R.id.youtube_thumb_view)
+        ImageView youtubeThumbView;
+        @BindView(R.id.pb_loading_thumb)
+        ProgressBar pbLoadingThumb;
         public TrailerViewHolder(View view){
             super(view);
-            binding = DataBindingUtil.bind(view);
-            binding.youtubeThumbView.setOnClickListener(this);
+            ButterKnife.bind(this, view);
+            youtubeThumbView.setOnClickListener(this);
         }
 
         public void bind() {
             Log.i(TrailerAdapter.class.getSimpleName(), "Binding tailer #" + getAdapterPosition());
-            Picasso.with(context)
-                    .load(NetworkUtils.buildYoutubeImageURL(trailerIds[getAdapterPosition()]))
-                    .placeholder(R.drawable.backdrop_placeholder)
+            Picasso.get()
+                    .load(MediaUtils.buildYoutubeImageURL(trailerIds[getAdapterPosition()]))
+                    .placeholder(R.drawable.poster_placeholder)
                     .error(R.drawable.error)
-                    .into(binding.youtubeThumbView, new Callback() {
+                    .into(youtubeThumbView, new Callback() {
                         @Override
                         public void onSuccess() {
-                            binding.pbLoadingThumb.setVisibility(View.INVISIBLE);
+                            pbLoadingThumb.setVisibility(View.INVISIBLE);
                         }
                         @Override
-                        public void onError() {
-                            binding.pbLoadingThumb.setVisibility(View.INVISIBLE);
+                        public void onError(Exception e) {
+                            e.printStackTrace();
+                            pbLoadingThumb.setVisibility(View.INVISIBLE);
                         }
                     });
         }

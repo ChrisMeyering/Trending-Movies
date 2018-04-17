@@ -1,12 +1,8 @@
 package com.movies.chris.trendingmovies.activity;
 
 import android.content.Intent;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.LinearSnapHelper;
@@ -16,34 +12,21 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.chris.popularMovies2.databinding.ActivityMovieDetailBinding;
-import com.example.chris.popularMovies2.utilities.JSONUtils;
-import com.example.chris.popularMovies2.utilities.MovieDetail;
-import com.example.chris.popularMovies2.utilities.NetworkUtils;
-import com.example.chris.popularMovies2.utilities.ReviewAdapter;
-import com.example.chris.popularMovies2.utilities.TrailerAdapter;
-import com.example.chris.popularMovies2.utilities.Utility;
-import com.google.android.youtube.player.YouTubeBaseActivity;
-import com.google.android.youtube.player.YouTubeInitializationResult;
-import com.google.android.youtube.player.YouTubePlayer;
 import com.movies.chris.trendingmovies.R;
+import com.movies.chris.trendingmovies.activity.UI.ReviewAdapter;
+import com.movies.chris.trendingmovies.activity.UI.TrailerAdapter;
 import com.movies.chris.trendingmovies.data.tmdb.model.detail.MovieDetail;
-import com.movies.chris.trendingmovies.utils.MediaUtils;
-import com.movies.chris.trendingmovies.utils.MovieUtils;
-import com.movies.chris.trendingmovies.data.tmdb.model.detail.Video;
 import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncUtils;
+import com.movies.chris.trendingmovies.utils.MediaUtils;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-
-import java.net.URL;
-
-import butterknife.BindView;
 
 import static com.movies.chris.trendingmovies.utils.MovieUtils.deleteFromFavorites;
 import static com.movies.chris.trendingmovies.utils.MovieUtils.isFavorite;
@@ -53,44 +36,28 @@ import static com.movies.chris.trendingmovies.utils.MovieUtils.saveToFavorites;
 public class MovieDetailActivity extends AppCompatActivity
 //        implements LoaderManager.LoaderCallbacks<MovieDetail>,
 //        YouTubePlayer.OnInitializedListener,
-//        TrailerAdapter.TrailerAdapterClickHandler
+ implements       TrailerAdapter.TrailerAdapterClickHandler
 {
+    ProgressBar pbLoadingBackdrop;
+    ImageView ivBackdrop;
+    ScrollView svParent;
+    ProgressBar pbLoadingPoster;
+    ImageView ivMoviePoster;
+    TextView tvReleaseDate;
+    Toolbar toolbar;
+    ProgressBar pbLoadingDetails;
+    FloatingActionButton fabFavorite;
+    TextView tvMovieError;
+    TextView tvGenres;
+    TextView tvRating;
+    TextView tvMovieInfo;
+    RecyclerView rvTrailers;
+    TrailerAdapter trailerAdapter;
+    RecyclerView rvReviews;
+    ReviewAdapter reviewAdapter;
 
     String TAG = MovieDetailActivity.class.getSimpleName();
     MovieDetail movieDetail = null;
-
-    @BindView(R.id.sv_parent)
-    ScrollView svParent;
-    @BindView(R.id.rv_reviews)
-    RecyclerView rvReviews;
-    @BindView(R.id.rv_trailers)
-    RecyclerView rvTrailers;
-    @BindView(R.id.pb_loading_backdrop)
-    ProgressBar pbLoadingBackdrop;
-    @BindView(R.id.iv_backdrop)
-    ImageView ivBackdrop;
-    @BindView(R.id.pb_loading_poster)
-    ProgressBar pbLoadingPoster;
-    @BindView(R.id.iv_movie_poster)
-    ImageView ivMoviePoster;
-    @BindView(R.id.tv_release_date)
-    TextView tvReleaseDate;
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
-    @BindView(R.id.pb_loading_details)
-    ProgressBar pbLoadingDetails;
-    @BindView(R.id.tv_movie_error)
-    TextView tvMovieError;
-    @BindView(R.id.fab_favorite)
-    FloatingActionButton fabFavorite;
-    @BindView(R.id.tv_genres)
-    TextView tvGenres;
-    @BindView(R.id.tv_rating)
-    TextView tvRating;
-    @BindView(R.id.tv_movie_info)
-    TextView tvMovieInfo;
-
-
 
 //    private int movieID;
 //    private boolean isFavorite;
@@ -102,12 +69,12 @@ public class MovieDetailActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.content_movie_detail);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setContentView(R.layout.activity_movie_detail);
+        initView();
 
-        initRecyclerViews();
         Intent startIntent = getIntent();
 
         if (savedInstanceState != null) {
@@ -132,6 +99,30 @@ public class MovieDetailActivity extends AppCompatActivity
         }
     }
 
+    private void initView() {
+        bindViews();
+        initReviewsRV();
+        initTrailersRV();
+    }
+
+    private void bindViews() {
+        svParent = findViewById(R.id.sv_parent);
+        rvReviews = findViewById(R.id.rv_reviews);
+        rvTrailers = findViewById(R.id.rv_trailers);
+        ivBackdrop = findViewById(R.id.iv_backdrop);
+        pbLoadingBackdrop = findViewById(R.id.pb_loading_backdrop);
+        ivMoviePoster = findViewById(R.id.iv_movie_poster);
+        pbLoadingPoster = findViewById(R.id.pb_loading_poster);
+        toolbar = findViewById(R.id.toolbar);
+        pbLoadingDetails = findViewById(R.id.pb_loading_details);
+        fabFavorite = findViewById(R.id.fab_favorite);
+        tvReleaseDate = findViewById(R.id.tv_release_date);
+        tvGenres = findViewById(R.id.tv_genres);
+        tvRating = findViewById(R.id.tv_rating);
+        tvMovieError = findViewById(R.id.tv_movie_error);
+        tvMovieInfo = findViewById(R.id.tv_movie_info);
+    }
+
     private void initReviewsRV() {
         rvReviews.setDrawingCacheEnabled(true);
         rvReviews.setFocusable(false);
@@ -151,17 +142,11 @@ public class MovieDetailActivity extends AppCompatActivity
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         rvTrailers.setLayoutManager(trailerLayoutManager);
         trailerLayoutManager.setAutoMeasureEnabled(true);
-        trailerAdapter =  new TrailerAdapter(this, this);
+        trailerAdapter =  new TrailerAdapter(this);
         rvTrailers.setAdapter(trailerAdapter);
         SnapHelper helper = new LinearSnapHelper();
         helper.attachToRecyclerView(rvTrailers);
     }
-
-    private void initRecyclerViews() {
-        initReviewsRV();
-        initTrailersRV();
-    }
-
 
     private void getMovieDetails() {
         MoviesSyncUtils.getTmdbMovieDetail(this, movieDetail.getId());
@@ -218,7 +203,7 @@ public class MovieDetailActivity extends AppCompatActivity
         else
             fabFavorite.setImageResource(R.drawable.ic_star_border_grey_600_24dp);
 
-        reviewAdapter.updateData(movieDetail.getReviewList());
+        reviewAdapter.updateData(movieDetail.getReviewList().getReviews());
         if (reviewAdapter.getItemCount() > 0) {
 //            reviewsGroup.setVisibility(View.VISIBLE);
         }
@@ -237,33 +222,36 @@ public class MovieDetailActivity extends AppCompatActivity
         //}
         showMovieInfo();
         showImageProgressBars();
-        Picasso.with(getBaseContext())
-                .load(MediaUtils.buildPosterURL(movieDetail.getPosterPath(), MediaUtils.measureWidth(ivMoviePoster))
+        Picasso.get()
+                .load(MediaUtils.buildPosterURL(movieDetail.getPosterPath(),
+                        MediaUtils.measureWidth(ivMoviePoster)))
                 .placeholder(R.drawable.poster_placeholder)
                 .error(R.drawable.error)
-                .into(ivMoviePoster, new com.squareup.picasso.Callback() {
+                .into(ivMoviePoster, new Callback() {
                     @Override
                     public void onSuccess() {
                         pbLoadingPoster.setVisibility(View.INVISIBLE);
                     }
-
                     @Override
-                    public void onError() {
+                    public void onError(Exception e) {
+                        e.printStackTrace();
                         pbLoadingPoster.setVisibility(View.INVISIBLE);
                     }
                 });
-        Picasso.with(getBaseContext()).
-                load(MediaUtils.buildBackdropURL(movieDetail.getBackdropPath(), MediaUtils.measureWidth(ivBackdrop))
+
+        Picasso.get()
+                .load(MediaUtils.buildBackdropURL(movieDetail.getBackdropPath(),
+                        MediaUtils.measureWidth(ivBackdrop)))
                 .placeholder(R.drawable.backdrop_placeholder)
                 .error(R.drawable.error)
-                .into(ivBackdrop, new com.squareup.picasso.Callback() {
+                .into(ivBackdrop, new Callback() {
                     @Override
                     public void onSuccess() {
                         pbLoadingBackdrop.setVisibility(View.INVISIBLE);
                     }
-
                     @Override
-                    public void onError() {
+                    public void onError(Exception e) {
+                        e.printStackTrace();
                         pbLoadingBackdrop.setVisibility(View.INVISIBLE);
                     }
                 });
@@ -386,5 +374,10 @@ public class MovieDetailActivity extends AppCompatActivity
                 }
                 break;
         }
+    }
+
+    @Override
+    public void watchTrailer(String trailerKey) {
+
     }
 }

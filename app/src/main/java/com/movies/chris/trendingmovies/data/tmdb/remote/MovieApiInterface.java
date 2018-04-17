@@ -9,7 +9,13 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
-import static com.movies.chris.trendingmovies.data.tmdb.remote.ApiUtils.*;
+import static com.movies.chris.trendingmovies.data.tmdb.remote.ApiUtils.PATH_PARAM_MOVIE_ID;
+import static com.movies.chris.trendingmovies.data.tmdb.remote.ApiUtils.PATH_PARAM_SORT_BY;
+import static com.movies.chris.trendingmovies.data.tmdb.remote.ApiUtils.QUERY_PARAM_APPEND_REVIEWS;
+import static com.movies.chris.trendingmovies.data.tmdb.remote.ApiUtils.QUERY_PARAM_APPEND_TO_RESPONSE;
+import static com.movies.chris.trendingmovies.data.tmdb.remote.ApiUtils.QUERY_PARAM_APPEND_VIDEOS;
+import static com.movies.chris.trendingmovies.data.tmdb.remote.ApiUtils.QUERY_PARAM_MOVIE_NAME;
+import static com.movies.chris.trendingmovies.data.tmdb.remote.ApiUtils.QUERY_PARAM_PAGE_NUMBER;
 /**
  * Created by chris on 3/2/18.
  */
@@ -24,7 +30,7 @@ public interface MovieApiInterface {
     Call<MovieList> searchByMovieName(@Query(QUERY_PARAM_MOVIE_NAME) String movieName,
                            @Query(QUERY_PARAM_PAGE_NUMBER) int pageNumber);
 
-    @GET("movie/{" + PATH_PARAM_MOVIE_ID + "?"
+    @GET("movie/{" + PATH_PARAM_MOVIE_ID + "}?"
             + QUERY_PARAM_APPEND_TO_RESPONSE + "="
             + QUERY_PARAM_APPEND_VIDEOS + ","
             + QUERY_PARAM_APPEND_REVIEWS)

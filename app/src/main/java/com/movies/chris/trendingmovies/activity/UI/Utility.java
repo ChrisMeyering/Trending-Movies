@@ -6,11 +6,8 @@ import android.os.IBinder;
 import android.support.design.widget.NavigationView;
 import android.util.DisplayMetrics;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.TextView;
 
-import com.movies.chris.trendingmovies.activity.MovieListActivity;
 import com.movies.chris.trendingmovies.data.provider.MoviesContract;
 
 public class Utility {

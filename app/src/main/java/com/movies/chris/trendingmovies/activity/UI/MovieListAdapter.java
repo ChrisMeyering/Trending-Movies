@@ -14,8 +14,8 @@ import android.widget.ProgressBar;
 import com.movies.chris.trendingmovies.R;
 import com.movies.chris.trendingmovies.data.provider.MoviesContract;
 import com.movies.chris.trendingmovies.data.tmdb.model.list.MoviePoster;
-import com.movies.chris.trendingmovies.utils.MovieUtils;
 import com.movies.chris.trendingmovies.utils.MediaUtils;
+import com.movies.chris.trendingmovies.utils.MovieUtils;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -49,9 +49,14 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
         void onClick(View view, MoviePoster poster);
     }
 
-    public MovieListAdapter(Context context, MovieAdapterClickHandler clickHandler) {
+    public MovieListAdapter(Context context) {
         this.context = context;
-        this.clickHandler = clickHandler;
+        try {
+            clickHandler = (MovieAdapterClickHandler) context;
+        } catch (ClassCastException e){
+            throw new ClassCastException(context.toString()
+                    + " must implement MovieAdapterClickHandler");
+        }
     }
 
     @NonNull

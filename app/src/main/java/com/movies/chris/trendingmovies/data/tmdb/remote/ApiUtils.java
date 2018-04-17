@@ -1,7 +1,5 @@
 package com.movies.chris.trendingmovies.data.tmdb.remote;
 
-import com.movies.chris.trendingmovies.BuildConfig;
-
 /**
  * Created by chris on 3/2/18.
  */

@@ -1,13 +1,16 @@
 
 package com.movies.chris.trendingmovies.data.tmdb.model.detail;
 
-import java.util.List;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.movies.chris.trendingmovies.data.tmdb.model.Genre;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MovieDetail implements Parcelable
 {
@@ -73,7 +76,9 @@ public class MovieDetail implements Parcelable
 
     protected MovieDetail(Parcel in) {
         this.backdropPath = ((String) in.readValue((String.class.getClassLoader())));
-        in.readList(this.genres, (Genre.class.getClassLoader()));
+        Log.i("MovieDetail", "backdropPath = " + backdropPath);
+        genres = new ArrayList<>();
+        in.readList(this.genres,(Genre.class.getClassLoader()));
         this.homepage = ((String) in.readValue((String.class.getClassLoader())));
         this.id = ((Integer) in.readValue((Integer.class.getClassLoader())));
         this.overview = ((String) in.readValue((String.class.getClassLoader())));
@@ -108,7 +113,7 @@ public class MovieDetail implements Parcelable
         for (Genre genre: genres) {
             String name = genre.getName();
             names += name;
-            if (name.equals(genres.get(genres.size()).getName())) {
+            if (name.equals(genres.get(genres.size() - 1).getName())) {
                 names += ".";
             } else {
                 names += ", ";

@@ -3,6 +3,9 @@ package com.movies.chris.trendingmovies.data.tmdb.remote;
 /**
  * Created by chris on 3/2/18.
  */
+
+import com.movies.chris.trendingmovies.BuildConfig;
+
 import java.io.IOException;
 
 import okhttp3.HttpUrl;
@@ -13,9 +16,6 @@ import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
-import com.movies.chris.trendingmovies.BuildConfig;
-import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncTask;
 
 public class RetrofitClient {
 
