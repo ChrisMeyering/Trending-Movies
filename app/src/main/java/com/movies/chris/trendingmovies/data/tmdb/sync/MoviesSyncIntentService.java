@@ -23,12 +23,17 @@ public class MoviesSyncIntentService extends IntentService {
     protected void onHandleIntent(@Nullable Intent intent) {
         if (intent != null) {
             if (intent.hasExtra(getString(R.string.key_query_uri)) &&
-                    intent.hasExtra(getString(R.string.key_sort_by)))
+                    intent.hasExtra(getString(R.string.key_sort_by))) {
                 MoviesSyncTask.syncMovies(this,
                         Uri.parse(intent.getStringExtra(getResources().getString(R.string.key_query_uri))),
                         intent.getStringExtra(getResources().getString(R.string.key_sort_by)),
                         intent.getIntExtra(getResources().getString(R.string.key_page_number), 1)
                 );
+            } else if (intent.hasExtra(getString(R.string.key_movie_id))) {
+                MoviesSyncTask.getMovieDetail(this,
+                        intent.getIntExtra(getString(R.string.key_movie_id), -1)
+                );
+            }
         }
     }
 }

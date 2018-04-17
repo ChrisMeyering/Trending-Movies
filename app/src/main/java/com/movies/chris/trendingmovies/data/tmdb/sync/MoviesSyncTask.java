@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 
 import com.movies.chris.trendingmovies.R;
 import com.movies.chris.trendingmovies.data.provider.MoviesContract;
-import com.movies.chris.trendingmovies.data.tmdb.model.MovieList;
+import com.movies.chris.trendingmovies.data.tmdb.model.detail.MovieDetail;
+import com.movies.chris.trendingmovies.data.tmdb.model.list.MovieList;
 import com.movies.chris.trendingmovies.data.tmdb.remote.ApiUtils;
 import com.movies.chris.trendingmovies.data.tmdb.remote.MovieApiInterface;
 
@@ -24,6 +26,26 @@ import retrofit2.Response;
 public class MoviesSyncTask {
     private static String TAG = MoviesSyncTask.class.getSimpleName();
     public static String EVENT_SYNC_COMPLETE = "com.movies.chris.trendingmovies.data.tmbd.sync.SYNC_COMPLETE";
+    public static String EVENT_MOVIE_DETAIL_RECEIVED = "com.movies.chris.trendingmovies.data.tmbd.sync.MOVIE_DETAIL_RECEIVED";
+
+    public static void getMovieDetail(final Context context, final int movieID) {
+        MovieApiInterface movieApiInterface = ApiUtils.getMovieApiInterface();
+        Call<MovieDetail> call = movieApiInterface.getMovieDetail(movieID);
+        call.enqueue(new Callback<MovieDetail>() {
+            @Override
+            public void onResponse(Call<MovieDetail> call, Response<MovieDetail> response) {
+                Intent intent = new Intent(EVENT_MOVIE_DETAIL_RECEIVED);
+                intent.putExtra(context.getString(R.string.key_movie_detail), response.body());
+                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+            }
+
+            @Override
+            public void onFailure(Call<MovieDetail> call, Throwable t) {
+                Toast.makeText(context, "Unable to fetch details for movie "+ movieID + ". Please" +
+                        " try again.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     synchronized public static void syncMovies(final Context context, final Uri uri, String sortBy, int pageNumber) {
         MovieApiInterface movieApiInterface = ApiUtils.getMovieApiInterface();

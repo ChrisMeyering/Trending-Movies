@@ -1,19 +1,18 @@
 
-package com.movies.chris.trendingmovies.data.tmdb.model;
+package com.movies.chris.trendingmovies.data.tmdb.model.list;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Movie;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.movies.chris.trendingmovies.data.provider.MoviesContract;
+import com.movies.chris.trendingmovies.utils.MovieUtils;
 
 public class MoviePoster implements Parcelable
 {
@@ -71,43 +70,16 @@ public class MoviePoster implements Parcelable
         return posterValues;
     }
 
-    public static boolean isFavorite (Context context, Cursor posters) {
-        MoviePoster poster = new MoviePoster(
-                posters.getInt(posters.getColumnIndex(MoviesContract.MOVIE_ID)),
-                posters.getString(posters.getColumnIndex(MoviesContract.POSTER_PATH)));
-        return  poster.isFavorite(context);
-    }
-
     public boolean isFavorite(Context context) {
-        Cursor c = context.getContentResolver().query(MoviesContract.FavoritesEntry.CONTENT_URI,
-                null,
-                MoviesContract.FavoritesEntry.getFavoritesWithIdSelection(),
-                MoviesContract.FavoritesEntry.getFavoritesWithIdSelectionArgs(id),
-                MoviesContract.FavoritesEntry.getSortOrder());
-        boolean ret = (c != null && c.getCount() > 0);
-        if (c != null)
-            c.close();
-        return ret;
+        return MovieUtils.isFavorite(context, id);
     }
 
     public boolean isRecent(Context context) {
-        Cursor c = context.getContentResolver().query(MoviesContract.RecentEntry.CONTENT_URI,
-                null,
-                MoviesContract.RecentEntry.getRecentsWithIdSelection(),
-                MoviesContract.RecentEntry.getRecentsWithIdSelectionArgs(id),
-                MoviesContract.RecentEntry.getSortOrder());
-        boolean ret = (c != null && c.getCount() > 0);
-        if (c != null)
-            c.close();
-        return ret;
+        return MovieUtils.isRecent(context, id);
     }
 
     public void deleteFromFavorites(Context context) {
-        Uri uri = MoviesContract.FavoritesEntry.CONTENT_URI.buildUpon()
-                .appendPath(String.valueOf(id))
-                .build();
-        Toast.makeText(context, "Movie removed from favorites", Toast.LENGTH_SHORT).show();
-        context.getContentResolver().delete(uri, null, null);
+        MovieUtils.deleteFromFavorites(context, id);
     }
 
     public void saveToFavorites(Context context) {

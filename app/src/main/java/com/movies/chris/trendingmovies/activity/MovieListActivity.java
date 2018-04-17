@@ -39,13 +39,12 @@ import com.movies.chris.trendingmovies.R;
 import com.movies.chris.trendingmovies.activity.UI.MovieListAdapter;
 import com.movies.chris.trendingmovies.activity.UI.Utility;
 import com.movies.chris.trendingmovies.data.provider.MoviesContract;
-import com.movies.chris.trendingmovies.data.tmdb.model.MoviePoster;
+import com.movies.chris.trendingmovies.data.tmdb.model.list.MoviePoster;
 import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncTask;
 import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import okhttp3.internal.Util;
 
 public class MovieListActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor>,
@@ -520,14 +519,13 @@ public class MovieListActivity extends AppCompatActivity
     public void onClick(View view, MoviePoster poster) {
         etSearchByName.clearFocus();
         Utility.hideKeyboard(MovieListActivity.this, getCurrentFocus().getWindowToken());
-        int id = view.getId();
+        int viewId = view.getId();
         Toast.makeText(this, "Movie " + poster.id + " selected.",
                 Toast.LENGTH_SHORT).show();
-        switch (id) {
+        switch (viewId) {
             case R.id.iv_poster:
-//                Intent intent = new Intent(this, MovieDetailActivity.class);
-//                intent.putExtra(getString(R.string.MOVIE_ID_KEY), movie.getId());
-//                intent.putExtra(getString(R.string.IS_FAVORITE), isFavorite(movie.getId()));
+                Intent intent = new Intent(this, MovieDetailActivity.class);
+                intent.putExtra(getString(R.string.key_movie_id), poster.id);
 //                startActivity(intent);
                 break;
 //            case R.id.ib_favorite:

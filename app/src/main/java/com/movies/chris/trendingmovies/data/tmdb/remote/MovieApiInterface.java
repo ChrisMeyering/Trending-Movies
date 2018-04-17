@@ -1,8 +1,8 @@
 package com.movies.chris.trendingmovies.data.tmdb.remote;
 
 import com.movies.chris.trendingmovies.data.tmdb.model.GenreList;
-import com.movies.chris.trendingmovies.data.tmdb.model.MovieDetail;
-import com.movies.chris.trendingmovies.data.tmdb.model.MovieList;
+import com.movies.chris.trendingmovies.data.tmdb.model.detail.MovieDetail;
+import com.movies.chris.trendingmovies.data.tmdb.model.list.MovieList;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

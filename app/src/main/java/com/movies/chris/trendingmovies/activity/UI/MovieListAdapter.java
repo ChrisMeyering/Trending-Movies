@@ -13,7 +13,8 @@ import android.widget.ProgressBar;
 
 import com.movies.chris.trendingmovies.R;
 import com.movies.chris.trendingmovies.data.provider.MoviesContract;
-import com.movies.chris.trendingmovies.data.tmdb.model.MoviePoster;
+import com.movies.chris.trendingmovies.data.tmdb.model.list.MoviePoster;
+import com.movies.chris.trendingmovies.utils.MovieUtils;
 import com.movies.chris.trendingmovies.utils.MediaUtils;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -68,16 +69,6 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
         }
     }
 
-//    private boolean isFavorite(int movieId) {
-//        if (favorites != null) {
-//            for (favorites.moveToFirst(); !favorites.isAfterLast(); favorites.moveToNext()) {
-//                if (favorites.getInt(moviePosters.getColumnIndex(MoviesContract.MOVIE_ID)) == movieId)
-//                    return true;
-//            }
-//        }
-//        return false;
-//    }
-
     @Override
     public int getItemCount() {
         return (moviePosters == null) ? 0 : moviePosters.getCount();
@@ -94,7 +85,6 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
         public PosterViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
-            view.measure(View.MeasureSpec.UNSPECIFIED,View.MeasureSpec.UNSPECIFIED);
             ivPoster.setOnClickListener(this);
             ibFavorite.setOnClickListener(this);
             width = MediaUtils.measureWidth(view);
@@ -125,8 +115,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
         private void bind() {
             int movieId = moviePosters.getInt(moviePosters.getColumnIndex(MoviesContract.MOVIE_ID));
             String posterPath = moviePosters.getString(moviePosters.getColumnIndex(MoviesContract.POSTER_PATH));
-//            if (favorites == null || MoviePoster.isFavorite(context, moviePosters)) {
-            if (MoviePoster.isFavorite(context, moviePosters)) {
+            if (MovieUtils.isFavorite(context, movieId)) {
                 ibFavorite.setImageResource(R.drawable.ic_star_orange_500_24dp);
             } else {
                 ibFavorite.setImageResource(R.drawable.ic_star_border_grey_600_24dp);

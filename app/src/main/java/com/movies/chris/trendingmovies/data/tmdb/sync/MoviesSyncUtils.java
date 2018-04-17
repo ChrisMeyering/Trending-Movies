@@ -30,4 +30,10 @@ public class MoviesSyncUtils {
     public static void getTmdbMovieList(@NonNull final Context context, Uri uri, String sortBy) {
         getTmdbMovieList(context, uri, sortBy, 1);
     }
+
+    public static void getTmdbMovieDetail(@NonNull final Context context, int movieID) {
+        Intent intent = new Intent(context, MoviesSyncIntentService.class);
+        intent.putExtra(context.getString(R.string.key_movie_id), movieID);
+        context.startService(intent);
+    }
 }

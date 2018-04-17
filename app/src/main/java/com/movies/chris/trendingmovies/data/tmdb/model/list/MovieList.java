@@ -1,4 +1,4 @@
-package com.movies.chris.trendingmovies.data.tmdb.model;
+package com.movies.chris.trendingmovies.data.tmdb.model.list;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,6 @@ import android.util.Log;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.movies.chris.trendingmovies.data.provider.MoviesContract;
 
 public class MovieList implements Parcelable
 {
