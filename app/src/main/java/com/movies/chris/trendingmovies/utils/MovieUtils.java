@@ -3,9 +3,13 @@ package com.movies.chris.trendingmovies.utils;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.design.widget.FloatingActionButton;
 
+import com.movies.chris.trendingmovies.R;
 import com.movies.chris.trendingmovies.data.provider.MoviesContract;
+import com.movies.chris.trendingmovies.data.tmdb.model.list.MoviePoster;
 
 public class MovieUtils {
 
@@ -44,6 +48,36 @@ public class MovieUtils {
                 .appendPath(String.valueOf(movieID))
                 .build();
         context.getContentResolver().delete(uri, null, null);
+    }
+
+    public static int getFavoriteImageResource(Context context, int movieId) {
+        return isFavorite(context, movieId) ?
+                R.drawable.ic_star_orange_500_24dp:
+                R.drawable.ic_star_border_orange_500_24dp;
+    }
+    public static void setFavoriteImageResource(Context context, FloatingActionButton fab, int movieId){
+        if (isFavorite(context, movieId)) {
+            fab.setImageResource(R.drawable.ic_star_orange_500_24dp);
+        } else {
+            fab.setImageResource(R.drawable.ic_star_border_orange_500_24dp);
+        }
+    }
+    public static void swapFavoriteImageResource(Context context, FloatingActionButton fab, MoviePoster moviePoster){
+        swapFavoriteImageResource(context, fab, moviePoster.id, moviePoster.posterPath);
+    }
+
+    public static int swapFavoriteImageResource(Context context, FloatingActionButton fab, int movieId, String posterPath){
+        int resourceID;
+        if (isFavorite(context, movieId)) {
+            fab.setImageResource(R.drawable.ic_star_border_orange_500_24dp);
+            deleteFromFavorites(context, movieId);
+            resourceID = R.drawable.ic_star_border_orange_500_24dp;
+        } else {
+            fab.setImageResource(R.drawable.ic_star_orange_500_24dp);
+            saveToFavorites(context, movieId, posterPath);
+            resourceID = R.drawable.ic_star_orange_500_24dp;
+        }
+        return resourceID;
     }
 
     private static ContentValues getPosterContentValues(int movieID, String posterPath) {

@@ -39,6 +39,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="16dp"
+            android:nestedScrollingEnabled="true"
             app:layout_constraintDimensionRatio="H,500:281"
             app:layout_constraintTop_toBottomOf="@id/synopsis_layout"
             app:layout_constraintStart_toStartOf="parent"

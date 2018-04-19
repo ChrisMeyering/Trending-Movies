@@ -34,12 +34,14 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <!--TODO: change favorites icon (bookmark icon?)-->
-    <ImageButton
-        android:id="@+id/ib_favorite"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_favorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:background="@drawable/favorite_icon_selector"
+        app:fabSize="mini"
+        android:backgroundTint="@color/transparent_grey"
+        app:borderWidth="0dp"
         android:elevation="4dp"
         android:padding="2dp"
         app:layout_constraintBottom_toBottomOf="parent"

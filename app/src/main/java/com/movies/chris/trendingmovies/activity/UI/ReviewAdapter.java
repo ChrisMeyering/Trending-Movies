@@ -2,6 +2,7 @@ package com.movies.chris.trendingmovies.activity.UI;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,6 +64,8 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         public void bind(Review review){
             tvAuthor.setText(review.getAuthor());
             tvReview.setText(review.getContent());
+            itemView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+            Log.i("ReviewAdapter", String.valueOf(itemView.getMeasuredHeight()));
         }
     }
 }

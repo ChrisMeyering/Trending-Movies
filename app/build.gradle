@@ -9,6 +9,7 @@ android {
         versionCode 1
         versionName "1.0"
         buildConfigField("String", "TMDB_API_KEY", TMDBApiKey)
+        buildConfigField("String", "YOUTUBE_API_KEY", YoutubeApiKey)
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -37,6 +38,7 @@ dependencies {
     implementation "com.android.support:exifinterface:$supportLibraryVersion"
     implementation "com.android.support:support-v4:$supportLibraryVersion"
     implementation "com.android.support:design:$supportLibraryVersion"
+    implementation "com.android.support:palette-v7:$supportLibraryVersion"
     implementation "com.android.support.constraint:constraint-layout:1.0.2"
     implementation 'com.google.code.gson:gson:2.8.0'
     implementation "com.squareup.retrofit2:retrofit:$retrofitLibraryVersion"

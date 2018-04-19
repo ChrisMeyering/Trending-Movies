@@ -17,16 +17,29 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".activity.MovieDetailActivity"
-            android:parentActivityName=".activity.MovieListActivity">
+        <activity
+            android:name=".activity.MovieDetailActivity"
+            android:parentActivityName=".activity.MovieListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.MovieListActivity"/>
+                android:value=".activity.MovieListActivity" />
         </activity>
+
+        <activity android:name=".activity.WatchTrailerActivity"
+            android:screenOrientation="landscape"
+            android:parentActivityName=".activity.MovieDetailActivity"
+            android:theme="@style/AppTheme.NoActionBar.FullScreen">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.MovieDetailActivity"
+                />
+        </activity>
+
         <provider
             android:name=".data.provider.MoviesProvider"
             android:authorities="@string/content_authority"
@@ -35,6 +48,7 @@
         <service
             android:name=".data.tmdb.sync.MoviesSyncIntentService"
             android:exported="false" />
+
     </application>
 
 </manifest>
