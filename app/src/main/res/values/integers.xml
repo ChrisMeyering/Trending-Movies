@@ -6,4 +6,5 @@
     <integer name="drawer_index_upcoming">3</integer>
     <integer name="drawer_index_recents">4</integer>
     <integer name="drawer_index_favorites">5</integer>
+    <integer name="anim_duration_short">300</integer>
 </resources>

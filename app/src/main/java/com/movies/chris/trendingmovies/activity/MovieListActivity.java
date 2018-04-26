@@ -35,17 +35,25 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.GooglePlayDriver;
+import com.firebase.jobdispatcher.Job;
+import com.firebase.jobdispatcher.Trigger;
 import com.movies.chris.trendingmovies.R;
 import com.movies.chris.trendingmovies.activity.UI.MovieListAdapter;
 import com.movies.chris.trendingmovies.activity.UI.Utility;
 import com.movies.chris.trendingmovies.data.provider.MoviesContract;
 import com.movies.chris.trendingmovies.data.tmdb.model.detail.MovieDetail;
 import com.movies.chris.trendingmovies.data.tmdb.model.list.MoviePoster;
+import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncJobService;
 import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncTask;
 import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static java.util.concurrent.TimeUnit.HOURS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class MovieListActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor>,
@@ -70,6 +78,7 @@ public class MovieListActivity extends AppCompatActivity
     private static final String SORT_RECENT = MoviesContract.PATH_RECENT;
 //    private static final String SORT_MOVIE_NAME = MoviesContract.PATH_MOVIE_NAME;
     private boolean isLoading = false;
+    private boolean resetAnimation = false;
     private SharedPreferences preferences;
     Parcelable layoutManagerSavedState = null;
     private String sortBy;
@@ -174,8 +183,22 @@ public class MovieListActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_list);
+        initJobDispatcher();
         initView();
         makeSortedMovieSearch();
+    }
+
+    private void initJobDispatcher() {
+        FirebaseJobDispatcher dispatcher =
+                new FirebaseJobDispatcher(new GooglePlayDriver(this));
+        Job job = dispatcher.newJobBuilder()
+                .setService(MoviesSyncJobService.class)
+                .setTag(MoviesSyncJobService.ACTION_START_DELETION)
+                .setRecurring(false)
+                .setTrigger(Trigger.executionWindow((int)HOURS.toSeconds(8),
+                        (int)HOURS.toSeconds(9)))
+                .build();
+        dispatcher.mustSchedule(job);
     }
 
     @Override
@@ -303,6 +326,8 @@ public class MovieListActivity extends AppCompatActivity
                 new GridLayoutManager(this, Utility.numOfGridColumns(this));
         rvMoviePosters.setLayoutManager(layoutManager);
         layoutManager.setAutoMeasureEnabled(true);
+//        rvMoviePosters.scheduleLayoutAnimation();
+
         rvMoviePosters.addOnScrollListener(rvScrollListener);
         rvMoviePosters.setOnTouchListener(new RecyclerView.OnTouchListener() {
             @Override
@@ -453,6 +478,7 @@ public class MovieListActivity extends AppCompatActivity
 
     private void resetRecyclerView() {
         rvMoviePosters.scrollToPosition(0);
+        movieAdapter.resetLastPosition();
     }
 
     @Override
@@ -514,6 +540,10 @@ public class MovieListActivity extends AppCompatActivity
                 if (swapCursor) {
                     data.setNotificationUri(getContentResolver(), queryUri);
                     movieAdapter.swapCursor(data);
+//                    if (resetAnimation) {
+//                        resetAnimation = false;
+//                        rvMoviePosters.startLayoutAnimation();
+//                    }
                     if (layoutManagerSavedState != null && data.getCount() > 0) {
                         rvMoviePosters.getLayoutManager().onRestoreInstanceState(layoutManagerSavedState);
                         layoutManagerSavedState = null;

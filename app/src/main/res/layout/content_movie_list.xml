@@ -8,7 +8,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.movies.chris.trendingmovies.activity.MovieListActivity">
 
-    <android.support.v7.widget.RecyclerView
+    <com.movies.chris.trendingmovies.activity.UI.GridRecyclerView
         android:id="@+id/rv_movie_posters"
         android:layout_width="0dp"
         android:layout_height="0dp"

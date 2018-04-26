@@ -193,6 +193,7 @@ public class MovieDetailActivity extends AppCompatActivity
         rvReviews.getLayoutManager().setAutoMeasureEnabled(true);
         reviewAdapter = new ReviewAdapter(this);
         rvReviews.setAdapter(reviewAdapter);
+
     }
 
     private void initTrailersRV(){
@@ -234,8 +235,8 @@ public class MovieDetailActivity extends AppCompatActivity
         switch(item.getItemId()) {
             // When the home button is pressed, take the user back to the VisualizerActivity
             case android.R.id.home:
-                super.onBackPressed();
-                break;
+                onBackPressed();
+                return true;
             case R.id.action_favorites:
                 toggleFavorite();
                 return true;

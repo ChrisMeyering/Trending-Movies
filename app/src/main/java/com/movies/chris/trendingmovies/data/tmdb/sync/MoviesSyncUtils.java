@@ -27,6 +27,11 @@ public class MoviesSyncUtils {
         context.startService(intent);
     }
 
+    public static void clearTmdbData(@NonNull Context context) {
+        Intent intent = new Intent(context,  MoviesSyncIntentService.class);
+        intent.setAction(MoviesSyncJobService.ACTION_START_DELETION);
+        context.startService(intent);
+    }
     public static void getTmdbMovieList(@NonNull final Context context, Uri uri, String sortBy) {
         getTmdbMovieList(context, uri, sortBy, 1);
     }

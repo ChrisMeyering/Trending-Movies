@@ -13,6 +13,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -35,7 +37,7 @@ import butterknife.ButterKnife;
 public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.PosterViewHolder> {
     private static final String TAG = MovieListAdapter.class.getSimpleName();
     private static final int ITEMS_PER_PAGE = 20;
-
+    private int lastPosition = -1;
     private Cursor moviePosters;
 //    private Cursor favorites = null;
     private final Context context;
@@ -116,6 +118,15 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
             }
         }
 
+        private void setAnimation(View viewToAnimate, int position)
+        {
+            if (position > lastPosition)
+            {
+                Animation animation = AnimationUtils.loadAnimation(context, R.anim.item_anim_from_bottom);
+                viewToAnimate.startAnimation(animation);
+                lastPosition = position;
+            }
+        }
         private void bind() {
             int movieId = moviePosters.getInt(moviePosters.getColumnIndex(MoviesContract.MOVIE_ID));
             String posterPath = moviePosters.getString(moviePosters.getColumnIndex(MoviesContract.POSTER_PATH));
@@ -154,10 +165,14 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
 //                            fabFavorite.setBackgroundTintList(ColorStateList.valueOf(accent))
                         }
                             });
+            setAnimation(itemView, getAdapterPosition());
         }
     }
 
 
+    public void resetLastPosition(){
+        lastPosition = -1;
+    }
 
     public void swapCursor(Cursor data) {
         moviePosters = data;

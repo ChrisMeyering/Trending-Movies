@@ -33,6 +33,8 @@ public class MoviesSyncIntentService extends IntentService {
                 MoviesSyncTask.getMovieDetail(this,
                         intent.getIntExtra(getString(R.string.key_movie_id), -1)
                 );
+            } else if (intent.getAction() != null && intent.getAction().equals(MoviesSyncJobService.ACTION_START_DELETION)) {
+                MoviesSyncTask.clearMovies(this);
             }
         }
     }

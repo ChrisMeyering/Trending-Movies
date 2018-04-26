@@ -1,5 +1,6 @@
 package com.movies.chris.trendingmovies.data.tmdb.sync;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -87,5 +88,13 @@ public class MoviesSyncTask {
                 LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
             }
         });
+    }
+
+    public static void clearMovies(Context context) {
+        ContentResolver cr = context.getContentResolver();
+        cr.delete(MoviesContract.FavoritesEntry.CONTENT_URI, null, null);
+        cr.delete(MoviesContract.TopRatedEntry.CONTENT_URI, null, null);
+        cr.delete(MoviesContract.MostPopularEntry.CONTENT_URI, null, null);
+        cr.delete(MoviesContract.NowPlayingEntry.CONTENT_URI, null, null);
     }
 }

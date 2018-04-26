@@ -46,9 +46,15 @@
             android:exported="false" />
 
         <service
-            android:name=".data.tmdb.sync.MoviesSyncIntentService"
-            android:exported="false" />
-
+            android:exported="false"
+            android:name=".data.tmdb.sync.MoviesSyncIntentService"/>
+        <service
+            android:exported="false"
+            android:name=".data.tmdb.sync.MoviesSyncJobService">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
