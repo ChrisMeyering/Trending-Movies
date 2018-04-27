@@ -4,8 +4,7 @@
 
     <item
         android:id="@+id/action_favorites"
-        android:title="@string/action_favorites"
         android:icon="@drawable/ic_star_border_orange_500_24dp"
-        android:orderInCategory="1"
+        android:title="@string/action_favorites"
         app:showAsAction="always"/>
 </menu>

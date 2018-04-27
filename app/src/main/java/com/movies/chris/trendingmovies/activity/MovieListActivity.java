@@ -12,11 +12,13 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -29,8 +31,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -78,7 +82,7 @@ public class MovieListActivity extends AppCompatActivity
     private static final String SORT_RECENT = MoviesContract.PATH_RECENT;
 //    private static final String SORT_MOVIE_NAME = MoviesContract.PATH_MOVIE_NAME;
     private boolean isLoading = false;
-    private boolean resetAnimation = false;
+    private boolean resetAnimation = true;
     private SharedPreferences preferences;
     Parcelable layoutManagerSavedState = null;
     private String sortBy;
@@ -98,6 +102,7 @@ public class MovieListActivity extends AppCompatActivity
     NavigationView navView;
     @BindView(R.id.et_search_by_name)
     EditText etSearchByName;
+    View selectedView;
 
     private RecyclerView.OnScrollListener rvScrollListener = new RecyclerView.OnScrollListener() {
         @Override
@@ -168,13 +173,6 @@ public class MovieListActivity extends AppCompatActivity
                     }
                     isLoading = false;
                     break;
-                case MoviesSyncTask.EVENT_MOVIE_DETAIL_RECEIVED:
-                    if (intent.hasExtra(getString(R.string.key_movie_detail))) {
-                        MovieDetail movieDetail = intent.getParcelableExtra(getString(R.string.key_movie_detail));
-                        Intent detailIntent = new Intent(MovieListActivity.this, MovieDetailActivity.class);
-                        detailIntent.putExtra(getString(R.string.key_movie_detail), movieDetail);
-                        startActivity(detailIntent);
-                    }
             }
         }
     };
@@ -326,8 +324,7 @@ public class MovieListActivity extends AppCompatActivity
                 new GridLayoutManager(this, Utility.numOfGridColumns(this));
         rvMoviePosters.setLayoutManager(layoutManager);
         layoutManager.setAutoMeasureEnabled(true);
-//        rvMoviePosters.scheduleLayoutAnimation();
-
+        rvMoviePosters.scheduleLayoutAnimation();
         rvMoviePosters.addOnScrollListener(rvScrollListener);
         rvMoviePosters.setOnTouchListener(new RecyclerView.OnTouchListener() {
             @Override
@@ -479,6 +476,7 @@ public class MovieListActivity extends AppCompatActivity
     private void resetRecyclerView() {
         rvMoviePosters.scrollToPosition(0);
         movieAdapter.resetLastPosition();
+        resetAnimation = true;
     }
 
     @Override
@@ -540,10 +538,10 @@ public class MovieListActivity extends AppCompatActivity
                 if (swapCursor) {
                     data.setNotificationUri(getContentResolver(), queryUri);
                     movieAdapter.swapCursor(data);
-//                    if (resetAnimation) {
-//                        resetAnimation = false;
-//                        rvMoviePosters.startLayoutAnimation();
-//                    }
+                    if (resetAnimation) {
+                        resetAnimation = false;
+                        rvMoviePosters.startLayoutAnimation();
+                    }
                     if (layoutManagerSavedState != null && data.getCount() > 0) {
                         rvMoviePosters.getLayoutManager().onRestoreInstanceState(layoutManagerSavedState);
                         layoutManagerSavedState = null;
@@ -562,23 +560,56 @@ public class MovieListActivity extends AppCompatActivity
     }
 
     @Override
-    public void onClick(View view, MoviePoster poster) {
+    public void onClick(ImageView sharedView, MoviePoster poster) {
         etSearchByName.clearFocus();
         Utility.hideKeyboard(MovieListActivity.this, getCurrentFocus().getWindowToken());
-        int viewId = view.getId();
-        Toast.makeText(this, "Movie " + poster.id + " selected.",
-                Toast.LENGTH_SHORT).show();
+        int viewId = sharedView.getId();
         switch (viewId) {
             case R.id.iv_poster:
-                MoviesSyncUtils.getTmdbMovieDetail(this, poster.id);
+//                MoviesSyncUtils.getTmdbMovieDetail(this, poster.id);
+//                selectedView = view;
+//                Toast.makeText(MovieListActivity.this, view.getTransitionName(), Toast.LENGTH_SHORT).show();
+                Intent detailIntent = new Intent(MovieListActivity.this, MovieDetailActivity.class);
+                String transitionName = ViewCompat.getTransitionName(sharedView);
+                Toast.makeText(MovieListActivity.this, "transitionName = " +transitionName,
+                        Toast.LENGTH_SHORT).show();
+                detailIntent.putExtra(getString(R.string.key_movie_id), poster.id);
+                detailIntent.putExtra(getString(R.string.transition_movie_poster), transitionName);
+                ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                        MovieListActivity.this, sharedView, transitionName
+                );
+                startActivity(detailIntent, options.toBundle());
                 break;
-//            case R.id.ib_favorite:
-//                if (poster.isFavorite(this)) {
-//                    poster.deleteFromFavorites(this);
-//                } else {
-//                    poster.saveToFavorites(this);
-//                }
-//                break;
         }
     }
+
+    @Override
+    public void onActivityReenter(int resultCode, Intent data) {
+        super.onActivityReenter(resultCode, data);
+        supportPostponeEnterTransition();
+        rvMoviePosters.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                rvMoviePosters.getViewTreeObserver().removeOnPreDrawListener(this);
+                rvMoviePosters.requestLayout();
+                supportStartPostponedEnterTransition();
+                return true;
+            }
+        });
+    }
 }
+/*
+
+                case MoviesSyncTask.EVENT_MOVIE_DETAIL_RECEIVED:
+                    if (intent.hasExtra(getString(R.string.key_movie_detail))) {
+                        MovieDetail movieDetail = intent.getParcelableExtra(getString(R.string.key_movie_detail));
+                        Intent detailIntent = new Intent(MovieListActivity.this, MovieDetailActivity.class);
+                        detailIntent.putExtra(getString(R.string.key_movie_detail), movieDetail);
+
+                        ActivityOptionsCompat options = ActivityOptionsCompat.
+                                makeSceneTransitionAnimation(MovieListActivity.this,
+                                        selectedView, selectedView.getTransitionName());
+
+                        startActivity(detailIntent, options.toBundle());
+                    }
+ */

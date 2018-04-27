@@ -1,6 +1,9 @@
 package com.movies.chris.trendingmovies.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -10,6 +13,8 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -33,6 +38,7 @@ import com.movies.chris.trendingmovies.R;
 import com.movies.chris.trendingmovies.activity.UI.ReviewAdapter;
 import com.movies.chris.trendingmovies.activity.UI.TrailerAdapter;
 import com.movies.chris.trendingmovies.data.tmdb.model.detail.MovieDetail;
+import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncTask;
 import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncUtils;
 import com.movies.chris.trendingmovies.utils.MediaUtils;
 import com.movies.chris.trendingmovies.utils.MovieUtils;
@@ -76,12 +82,33 @@ public class MovieDetailActivity extends AppCompatActivity
     String TAG = MovieDetailActivity.class.getSimpleName();
     MovieDetail movieDetail = null;
 
-//    private int movieID;
+    private int movieID;
+    private String transitionName;
 //    private boolean isFavorite;
 //    private ReviewAdapter reviewAdapter;
 //    private TrailerAdapter trailerAdapter;
 //    private ActivityMovieDetailBinding movieDetailBinding;
 //    private String currentTrailerKey;
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction() != null)
+                switch (intent.getAction()) {
+                    case MoviesSyncTask.EVENT_MOVIE_DETAIL_RECEIVED:
+                        LocalBroadcastManager.getInstance(MovieDetailActivity.this).unregisterReceiver(receiver);
+                        if (intent.hasExtra(getString(R.string.key_movie_detail))) {
+                            movieDetail = intent.getParcelableExtra(getString(R.string.key_movie_detail));
+                            if (movieDetail == null)
+                                showError();
+                            else
+                                bindMovieInfo();
+                        }
+                        invalidateOptionsMenu();
+
+                }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,12 +118,17 @@ public class MovieDetailActivity extends AppCompatActivity
 //        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 //                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_movie_detail);
+        supportPostponeEnterTransition();
         initView();
 
+        LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        localBroadcastManager.registerReceiver(receiver,
+                new IntentFilter(MoviesSyncTask.EVENT_MOVIE_DETAIL_RECEIVED));
         Intent startIntent = getIntent();
 
         if (savedInstanceState != null) {
             movieDetail = savedInstanceState.getParcelable(getString(R.string.key_movie_detail));
+            bindMovieInfo();
             final int[] position = savedInstanceState.getIntArray(getString(R.string.key_scroll_view_postition));
             if (position != null && position.length == 2) {
                 svParent.post(new Runnable() {
@@ -110,14 +142,19 @@ public class MovieDetailActivity extends AppCompatActivity
                 });
             }
         } else if (startIntent != null) {
-            if (startIntent.hasExtra(getString(R.string.key_movie_detail)))
-                movieDetail = startIntent.getParcelableExtra(getString(R.string.key_movie_detail));
+            if (startIntent.hasExtra(getString(R.string.transition_movie_poster)))
+                transitionName = startIntent.getStringExtra(getString(R.string.transition_movie_poster));
+            if (startIntent.hasExtra(getString(R.string.key_movie_id))) {
+                movieID = startIntent.getIntExtra(getString(R.string.key_movie_id),0);
+                pbLoadingDetails.setVisibility(View.VISIBLE);
+                MoviesSyncUtils.getTmdbMovieDetail(this, movieID);
+            }
         }
-        if (movieDetail == null){
-            showError();
-        } else {
-            bindMovieInfo();
-        }
+//        if (movieDetail == null){
+//            showError();
+//        } else {
+//            bindMovieInfo();
+//        }
     }
 
     private void initView() {
@@ -146,7 +183,7 @@ public class MovieDetailActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.movie_detail, menu);
         favoriteMenu = menu.findItem(R.id.action_favorites);
-        favoriteMenu.setIcon(getFavoriteImageResource(this, movieDetail.getId()));
+        favoriteMenu.setIcon(getFavoriteImageResource(this, movieID));
         return true;
     }
 
@@ -230,18 +267,30 @@ public class MovieDetailActivity extends AppCompatActivity
         tvMovieError.setVisibility(View.VISIBLE);
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             // When the home button is pressed, take the user back to the VisualizerActivity
             case android.R.id.home:
-                onBackPressed();
+                Toast.makeText(MovieDetailActivity.this, "transitionName = " +transitionName,
+                        Toast.LENGTH_SHORT).show();
+                supportFinishAfterTransition();
+//                super.onBackPressed();
                 return true;
             case R.id.action_favorites:
                 toggleFavorite();
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void finishAfterTransition() {
+        Intent data = new Intent();
+        data.putExtra(getString(R.string.transition_movie_poster), transitionName);
+        setResult(RESULT_OK, data);
+        super.finishAfterTransition();
     }
 
     @Override
@@ -254,12 +303,13 @@ public class MovieDetailActivity extends AppCompatActivity
 
     private void showImageProgressBars() {
         pbLoadingBackdrop.setVisibility(View.VISIBLE);
-        pbLoadingPoster.setVisibility(View.VISIBLE);
+//        pbLoadingPoster.setVisibility(View.VISIBLE);
+        pbLoadingPoster.setVisibility(View.INVISIBLE);
     }
 
     protected void bindMovieInfo() {
         MovieUtils.setFavoriteImageResource(this, fabFavorite,  movieDetail.getId());
-
+        ViewCompat.setTransitionName(ivMoviePoster, transitionName);
         collapsingToolbarLayout.setTitle(movieDetail.getTitle());
         tvReleaseDate.setText(movieDetail.getReleaseDate());
         tvGenres.setText(movieDetail.getGenreNames());
@@ -295,15 +345,18 @@ public class MovieDetailActivity extends AppCompatActivity
                         MediaUtils.measureWidth(ivMoviePoster)))
                 .placeholder(R.drawable.poster_placeholder)
                 .error(R.drawable.error)
+                .noFade()
                 .into(ivMoviePoster, new Callback() {
                     @Override
                     public void onSuccess() {
                         pbLoadingPoster.setVisibility(View.INVISIBLE);
+                        supportStartPostponedEnterTransition();
                     }
                     @Override
                     public void onError(Exception e) {
                         e.printStackTrace();
                         pbLoadingPoster.setVisibility(View.INVISIBLE);
+                        supportStartPostponedEnterTransition();
                     }
                 });
 

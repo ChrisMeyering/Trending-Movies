@@ -6,8 +6,10 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -54,7 +56,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
 //    }
 
     public interface MovieAdapterClickHandler {
-        void onClick(View view, MoviePoster poster);
+        void onClick(ImageView sharedView, MoviePoster poster);
     }
 
     public MovieListAdapter(Context context) {
@@ -81,6 +83,18 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
             holder.bind();
         }
     }
+//
+//    @Override
+//    public void onViewAttachedToWindow(@NonNull PosterViewHolder holder) {
+//        super.onViewAttachedToWindow(holder);
+//        holder.setAnimation(holder.itemView, holder.getAdapterPosition());
+//    }
+//
+//    @Override
+//    public void onViewDetachedFromWindow(@NonNull PosterViewHolder holder) {
+//        super.onViewDetachedFromWindow(holder);
+//        holder.itemView.clearAnimation();
+//    }
 
     @Override
     public int getItemCount() {
@@ -114,12 +128,11 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
                 if (poster.isRecent(context))
                     poster.deleteFromRecents(context);
                 poster.saveToRecents(context);
-                clickHandler.onClick(view, poster);
+                clickHandler.onClick((ImageView) view, poster);
             }
         }
 
-        private void setAnimation(View viewToAnimate, int position)
-        {
+        private void setAnimation(View viewToAnimate, int position) {
             if (position > lastPosition)
             {
                 Animation animation = AnimationUtils.loadAnimation(context, R.anim.item_anim_from_bottom);
@@ -129,6 +142,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
         }
         private void bind() {
             int movieId = moviePosters.getInt(moviePosters.getColumnIndex(MoviesContract.MOVIE_ID));
+            ViewCompat.setTransitionName(ivPoster, String.valueOf(getAdapterPosition()));
             String posterPath = moviePosters.getString(moviePosters.getColumnIndex(MoviesContract.POSTER_PATH));
             MovieUtils.setFavoriteImageResource(context, fabFavorite, movieId);
             pbLoadingPoster.setVisibility(View.VISIBLE);
@@ -138,7 +152,6 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
                     .into(ivPoster, new Callback() {
                                 @Override
                                 public void onSuccess() {
-
                                     Bitmap bitmap = ((BitmapDrawable) ivPoster.getDrawable()).getBitmap();
                                     if (bitmap != null) {
                                         Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
