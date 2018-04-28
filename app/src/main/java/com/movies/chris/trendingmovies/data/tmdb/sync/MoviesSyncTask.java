@@ -4,8 +4,10 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.movies.chris.trendingmovies.R;
@@ -28,6 +30,7 @@ public class MoviesSyncTask {
     public static final String EVENT_SYNC_COMPLETE = "com.movies.chris.trendingmovies.data.tmbd.sync.SYNC_COMPLETE";
     public static final String EVENT_MOVIE_DETAIL_RECEIVED = "com.movies.chris.trendingmovies.data.tmbd.sync.MOVIE_DETAIL_RECEIVED";
 
+
     public static void getMovieDetail(final Context context, final int movieID) {
         MovieApiInterface movieApiInterface = ApiUtils.getMovieApiInterface();
         Call<MovieDetail> call = movieApiInterface.getMovieDetail(movieID);
@@ -41,8 +44,9 @@ public class MoviesSyncTask {
 
             @Override
             public void onFailure(Call<MovieDetail> call, Throwable t) {
-                Toast.makeText(context, "Unable to fetch details for movie "+ movieID + ". Please" +
-                        " try again.", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(EVENT_MOVIE_DETAIL_RECEIVED);
+                LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
             }
         });
     }

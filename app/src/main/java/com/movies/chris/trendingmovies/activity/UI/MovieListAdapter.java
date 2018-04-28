@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.Image;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewCompat;
@@ -39,6 +40,9 @@ import butterknife.ButterKnife;
 public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.PosterViewHolder> {
     private static final String TAG = MovieListAdapter.class.getSimpleName();
     private static final int ITEMS_PER_PAGE = 20;
+    private static final String FAB_TRANSITION_BASE = "fab ";
+    private static final String POSTER_TRANSITION_BASE = "poster ";
+
     private int lastPosition = -1;
     private Cursor moviePosters;
 //    private Cursor favorites = null;
@@ -56,7 +60,8 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
 //    }
 
     public interface MovieAdapterClickHandler {
-        void onClick(ImageView sharedView, MoviePoster poster);
+        void onClick(ImageView sharedImageView, MoviePoster poster);
+        void onClick(FloatingActionButton fab, MoviePoster poster);
     }
 
     public MovieListAdapter(Context context) {
@@ -79,8 +84,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
     @Override
     public void onBindViewHolder(@NonNull PosterViewHolder holder, int position) {
         if (!moviePosters.isClosed()) {
-            moviePosters.moveToPosition(position);
-            holder.bind();
+            holder.bind(position);
         }
     }
 //
@@ -101,35 +105,41 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
         return (moviePosters == null) ? 0 : moviePosters.getCount();
     }
 
-    public class PosterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class PosterViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.iv_poster)
         ImageView ivPoster;
         @BindView(R.id.fab_favorite)
         FloatingActionButton fabFavorite;
         @BindView(R.id.pb_loading_movie_poster)
         ProgressBar pbLoadingPoster;
+        MoviePoster poster;
         int width;
         public PosterViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
-            ivPoster.setOnClickListener(this);
-            fabFavorite.setOnClickListener(this);
+            ivPoster.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AsyncTask.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (poster.isRecent(context))
+                                poster.deleteFromRecents(context);
+                            poster.saveToRecents(context);
+                        }
+                    });
+                    clickHandler.onClick(ivPoster, poster);
+                }
+            });
+            fabFavorite.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    clickHandler.onClick(fabFavorite, poster);
+
+                }
+            });
             width = MediaUtils.measureWidth(view);
 
-        }
-
-        @Override
-        public void onClick(View view) {
-            moviePosters.moveToPosition(getAdapterPosition());
-            MoviePoster poster = MoviePoster.getPoster(moviePosters);
-            if (view.getId() == R.id.fab_favorite) {
-                MovieUtils.swapFavoriteImageResource(context, fabFavorite, poster);
-            } else {
-                if (poster.isRecent(context))
-                    poster.deleteFromRecents(context);
-                poster.saveToRecents(context);
-                clickHandler.onClick((ImageView) view, poster);
-            }
         }
 
         private void setAnimation(View viewToAnimate, int position) {
@@ -140,27 +150,19 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
                 lastPosition = position;
             }
         }
-        private void bind() {
-            int movieId = moviePosters.getInt(moviePosters.getColumnIndex(MoviesContract.MOVIE_ID));
-            ViewCompat.setTransitionName(ivPoster, String.valueOf(getAdapterPosition()));
-            String posterPath = moviePosters.getString(moviePosters.getColumnIndex(MoviesContract.POSTER_PATH));
-            MovieUtils.setFavoriteImageResource(context, fabFavorite, movieId);
+        private void bind(int position) {
+            moviePosters.moveToPosition(position);
+            poster = MoviePoster.getPoster(moviePosters);
+            ViewCompat.setTransitionName(ivPoster, POSTER_TRANSITION_BASE + position);
+            ViewCompat.setTransitionName(fabFavorite, FAB_TRANSITION_BASE + position);
+            MovieUtils.setFavoriteImageResource(context, fabFavorite, poster.id);
             pbLoadingPoster.setVisibility(View.VISIBLE);
-            Picasso.get().load(MediaUtils.buildPosterURL(posterPath, width))
+            Picasso.get().load(MediaUtils.buildPosterURL(poster.posterPath, width))
                     .placeholder(R.drawable.poster_placeholder)
                     .error(R.drawable.error)
                     .into(ivPoster, new Callback() {
                                 @Override
                                 public void onSuccess() {
-                                    Bitmap bitmap = ((BitmapDrawable) ivPoster.getDrawable()).getBitmap();
-                                    if (bitmap != null) {
-                                        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-                                            @Override
-                                            public void onGenerated(@NonNull Palette p) {
-                                                applyPalette(p);
-                                            }
-                                        });
-                                    }
                                     pbLoadingPoster.setVisibility(View.INVISIBLE);
                                 }
                                 @Override
@@ -168,15 +170,6 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
                                     e.printStackTrace();
                                     pbLoadingPoster.setVisibility(View.INVISIBLE);
                                 }
-                        private void applyPalette(Palette p) {
-//
-//                            //Toolbar
-//                            Resources resources = context.getResources();
-//                            int accent = p.getDarkVibrantColor(
-//                                            p.getLightVibrantColor(
-//                                                    resources.getColor(android.R.color.white)));
-//                            fabFavorite.setBackgroundTintList(ColorStateList.valueOf(accent))
-                        }
                             });
             setAnimation(itemView, getAdapterPosition());
         }

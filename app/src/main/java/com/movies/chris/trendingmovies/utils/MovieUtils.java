@@ -62,8 +62,8 @@ public class MovieUtils {
             fab.setImageResource(R.drawable.ic_star_border_orange_500_24dp);
         }
     }
-    public static void swapFavoriteImageResource(Context context, FloatingActionButton fab, MoviePoster moviePoster){
-        swapFavoriteImageResource(context, fab, moviePoster.id, moviePoster.posterPath);
+    public static boolean swapFavoriteImageResource(Context context, FloatingActionButton fab, MoviePoster moviePoster){
+        return swapFavoriteImageResource(context, fab, moviePoster.id, moviePoster.posterPath) == R.drawable.ic_star_orange_500_24dp;
     }
 
     public static int swapFavoriteImageResource(Context context, FloatingActionButton fab, int movieId, String posterPath){

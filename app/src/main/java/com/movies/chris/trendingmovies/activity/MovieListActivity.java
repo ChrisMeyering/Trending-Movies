@@ -9,14 +9,20 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.util.Pair;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -39,9 +45,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.jobdispatcher.Constraint;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.firebase.jobdispatcher.Job;
+import com.firebase.jobdispatcher.RetryStrategy;
 import com.firebase.jobdispatcher.Trigger;
 import com.movies.chris.trendingmovies.R;
 import com.movies.chris.trendingmovies.activity.UI.MovieListAdapter;
@@ -52,6 +60,7 @@ import com.movies.chris.trendingmovies.data.tmdb.model.list.MoviePoster;
 import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncJobService;
 import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncTask;
 import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncUtils;
+import com.movies.chris.trendingmovies.utils.MovieUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -80,7 +89,6 @@ public class MovieListActivity extends AppCompatActivity
     private static final String SORT_UPCOMING = MoviesContract.PATH_UPCOMING;
     private static final String SORT_FAVORITES = MoviesContract.PATH_FAVORITES;
     private static final String SORT_RECENT = MoviesContract.PATH_RECENT;
-//    private static final String SORT_MOVIE_NAME = MoviesContract.PATH_MOVIE_NAME;
     private boolean isLoading = false;
     private boolean resetAnimation = true;
     private SharedPreferences preferences;
@@ -88,6 +96,7 @@ public class MovieListActivity extends AppCompatActivity
     private String sortBy;
     private MovieListAdapter movieAdapter;
     private int RV_VISIBLE_THRESHOLD = 7;
+
     @BindView(R.id.rv_movie_posters)
     RecyclerView rvMoviePosters;
     @BindView(R.id.pb_loading_movie_list)
@@ -102,8 +111,8 @@ public class MovieListActivity extends AppCompatActivity
     NavigationView navView;
     @BindView(R.id.et_search_by_name)
     EditText etSearchByName;
-    View selectedView;
 
+    ImageView sharedView = null;
     private RecyclerView.OnScrollListener rvScrollListener = new RecyclerView.OnScrollListener() {
         @Override
         public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -138,12 +147,15 @@ public class MovieListActivity extends AppCompatActivity
             switch (sortBy) {
                 case SORT_FAVORITES:
                 case SORT_RECENT:
-//                    Toast.makeText(MovieListActivity.this, "No more items to load!" ,
-//                            Toast.LENGTH_LONG).show();
                     break;
                 case SORT_UPCOMING:
                 case SORT_NOW_PLAYING:
-                    if (movieAdapter.getItemCount() >= 100)
+                    int itemCount = movieAdapter.getItemCount();
+                    //TMDB Upcoming and Now playing data is inconsistent and will have
+                    //duplicate movie ids (it has at least two different lists for the same url
+                    //aka: two identical urls can have different results
+                    if (itemCount >= 100 &&
+                            itemCount%Utility.numOfGridColumns(MovieListActivity.this) ==0)
                         break;
                 default:
                     isLoading = true;
@@ -156,7 +168,6 @@ public class MovieListActivity extends AppCompatActivity
                     break;
             }
         }
-
     };
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
@@ -192,9 +203,11 @@ public class MovieListActivity extends AppCompatActivity
         Job job = dispatcher.newJobBuilder()
                 .setService(MoviesSyncJobService.class)
                 .setTag(MoviesSyncJobService.ACTION_START_DELETION)
-                .setRecurring(false)
-                .setTrigger(Trigger.executionWindow((int)HOURS.toSeconds(8),
-                        (int)HOURS.toSeconds(9)))
+                .setRecurring(true)
+                .setReplaceCurrent(false)
+                .setTrigger(Trigger.executionWindow((int)HOURS.toSeconds(4),(int)HOURS.toSeconds(7)))
+                .setConstraints(Constraint.ON_ANY_NETWORK, Constraint.DEVICE_IDLE)
+                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
                 .build();
         dispatcher.mustSchedule(job);
     }
@@ -248,9 +261,9 @@ public class MovieListActivity extends AppCompatActivity
                 return LOADER_RECENTS_ID;
             default:
                 return LOADER_MOVIE_NAME_ID;
-//                throw new UnsupportedOperationException("Sort option not implemented: " + sortBy);
         }
     }
+
     private Uri getQueryUri() {
         switch(sortBy) {
             case SORT_BY_RATING:
@@ -267,9 +280,9 @@ public class MovieListActivity extends AppCompatActivity
                 return MoviesContract.RecentEntry.CONTENT_URI;
             default:
                 return MoviesContract.MovieNameEntry.CONTENT_URI;
-//                throw new UnsupportedOperationException("URI option not implemented: " + sortBy);
         }
     }
+
     private void makeSortedMovieSearch(){
         LoaderManager loaderManager = getSupportLoaderManager();
         int loaderID = getLoaderID();
@@ -317,7 +330,6 @@ public class MovieListActivity extends AppCompatActivity
         rvMoviePosters.setHasFixedSize(true);
         rvMoviePosters.setItemViewCacheSize(30);
         rvMoviePosters.setDrawingCacheEnabled(true);
-//        rvMoviePosters.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         movieAdapter = new MovieListAdapter(this);
         rvMoviePosters.setAdapter(movieAdapter);
         final RecyclerView.LayoutManager layoutManager =
@@ -352,7 +364,6 @@ public class MovieListActivity extends AppCompatActivity
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
         navView.setNavigationItemSelectedListener(this);
-
         switch (sortBy) {
             case SORT_BY_RATING:
                 navView.getMenu()
@@ -389,7 +400,6 @@ public class MovieListActivity extends AppCompatActivity
         }
     }
 
-
     @Override
     public void onBackPressed() {
         etSearchByName.clearFocus();
@@ -403,7 +413,6 @@ public class MovieListActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.movie_list, menu);
         return true;
     }
@@ -549,14 +558,38 @@ public class MovieListActivity extends AppCompatActivity
                 }
             }
         }
-//        else {
-//            showError();
-//        }
         pbLoadingMovieList.setVisibility(View.INVISIBLE);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        pbLoadingMovieList.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public void onClick(final FloatingActionButton fab, final MoviePoster poster) {
+        if (MovieUtils.swapFavoriteImageResource(this, fab, poster)){
+            Snackbar snackbar = Snackbar
+                    .make(rvMoviePosters, "Movie saved to Favorites", Snackbar.LENGTH_LONG)
+                    .setAction("UNDO", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            MovieUtils.swapFavoriteImageResource(MovieListActivity.this, fab, poster);
+                        }
+                    });
+            snackbar.show();
+        } else {
+            Snackbar snackbar = Snackbar
+                    .make(rvMoviePosters, "Movie removed from Favorites", Snackbar.LENGTH_LONG)
+                    .setAction("UNDO", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            MovieUtils.swapFavoriteImageResource(MovieListActivity.this, fab, poster);
+                        }
+                    });
+            snackbar.show();
+        }
+
     }
 
     @Override
@@ -566,50 +599,71 @@ public class MovieListActivity extends AppCompatActivity
         int viewId = sharedView.getId();
         switch (viewId) {
             case R.id.iv_poster:
-//                MoviesSyncUtils.getTmdbMovieDetail(this, poster.id);
-//                selectedView = view;
-//                Toast.makeText(MovieListActivity.this, view.getTransitionName(), Toast.LENGTH_SHORT).show();
-                Intent detailIntent = new Intent(MovieListActivity.this, MovieDetailActivity.class);
-                String transitionName = ViewCompat.getTransitionName(sharedView);
-                Toast.makeText(MovieListActivity.this, "transitionName = " +transitionName,
-                        Toast.LENGTH_SHORT).show();
-                detailIntent.putExtra(getString(R.string.key_movie_id), poster.id);
-                detailIntent.putExtra(getString(R.string.transition_movie_poster), transitionName);
-                ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                        MovieListActivity.this, sharedView, transitionName
-                );
-                startActivity(detailIntent, options.toBundle());
+                this.sharedView = sharedView;
+                startDetailActivity(poster.id);
                 break;
         }
     }
 
+    @SuppressLint("RestrictedApi")
+    private void startDetailActivity(Integer id) {
+        pbLoadingMovieList.setVisibility(View.VISIBLE);
+
+        Intent detailIntent = new Intent(MovieListActivity.this, MovieDetailActivity.class);
+        String imageTransitionName = ViewCompat.getTransitionName(sharedView);
+        String progressTransitionName = ViewCompat.getTransitionName(pbLoadingMovieList);
+        detailIntent.putExtra(getString(R.string.key_movie_id), id);
+        detailIntent.putExtra(getString(R.string.transition_movie_poster), imageTransitionName);
+        Pair<View, String> p1 = Pair.create((View)sharedView, imageTransitionName);
+        Pair<View, String> p2 = Pair.create((View)pbLoadingMovieList, progressTransitionName);
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                MovieListActivity.this, p1, p2);
+        startActivityForResult(detailIntent, MovieDetailActivity.REQUEST_MOVIE_DETAIL, options.toBundle());
+        pbLoadingMovieList.bringToFront();
+
+    }
+
     @Override
-    public void onActivityReenter(int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode==MovieDetailActivity.REQUEST_MOVIE_DETAIL && resultCode != RESULT_OK) {
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    pbLoadingMovieList.setVisibility(View.INVISIBLE);
+                }
+            });
+            Snackbar snackbar = Snackbar
+                    .make(rvMoviePosters, "Unable to fetch details. Please try again.", Snackbar.LENGTH_LONG)
+                    .setAction("RETRY", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            startDetailActivity(resultCode);
+                        }
+                    });
+            snackbar.show();
+
+        }
+    }
+
+    @Override
+    public void onActivityReenter(final int resultCode, final Intent data) {
         super.onActivityReenter(resultCode, data);
+        Log.i(TAG, "onActivityReenter");
         supportPostponeEnterTransition();
-        rvMoviePosters.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                rvMoviePosters.getViewTreeObserver().removeOnPreDrawListener(this);
-                rvMoviePosters.requestLayout();
-                supportStartPostponedEnterTransition();
-                return true;
-            }
-        });
+        if (resultCode == RESULT_OK) {
+            sharedView = null;
+            rvMoviePosters.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    rvMoviePosters.getViewTreeObserver().removeOnPreDrawListener(this);
+                    rvMoviePosters.requestLayout();
+                    supportStartPostponedEnterTransition();
+                    return true;
+                }
+            });
+        }
+
     }
 }
-/*
-
-                case MoviesSyncTask.EVENT_MOVIE_DETAIL_RECEIVED:
-                    if (intent.hasExtra(getString(R.string.key_movie_detail))) {
-                        MovieDetail movieDetail = intent.getParcelableExtra(getString(R.string.key_movie_detail));
-                        Intent detailIntent = new Intent(MovieListActivity.this, MovieDetailActivity.class);
-                        detailIntent.putExtra(getString(R.string.key_movie_detail), movieDetail);
-
-                        ActivityOptionsCompat options = ActivityOptionsCompat.
-                                makeSceneTransitionAnimation(MovieListActivity.this,
-                                        selectedView, selectedView.getTransitionName());
-
-                        startActivity(detailIntent, options.toBundle());
-                    }
- */

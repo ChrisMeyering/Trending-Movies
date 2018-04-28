@@ -44,5 +44,7 @@
     <string name="release_date">Release date:</string>
     <string name="youtube_player_error">Error initializing YouTube player: %s</string>
     <string name="transition_movie_poster">movie poster transition</string>
+    <string name="transition_fab">fab transition</string>
+    <string name="transition_pb">progress bar transition</string>
 
 </resources>

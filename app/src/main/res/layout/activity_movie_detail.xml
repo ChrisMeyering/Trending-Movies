@@ -67,6 +67,7 @@
         app:layout_anchorGravity="bottom|right|end"
         android:layout_margin="@dimen/fab_margin"
         android:elevation="8dp"
+        android:alpha="0"
         app:fabSize="normal"
         />
     <android.support.v4.widget.NestedScrollView
@@ -151,6 +152,7 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:visibility="invisible"
+                android:transitionName="@string/transition_pb"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
