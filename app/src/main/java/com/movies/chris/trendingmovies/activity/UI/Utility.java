@@ -14,11 +14,11 @@ public class Utility {
     public static int numOfGridColumns(Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        return Math.max((int) (dpWidth / 160), 3);
+        return Math.max((int) (dpWidth / 300), 3);
     }
 
     public static void hideKeyboard(Context context, IBinder binder) {
-        InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(context.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(binder, 0);
     }
 

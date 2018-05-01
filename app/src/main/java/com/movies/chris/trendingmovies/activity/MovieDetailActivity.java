@@ -96,7 +96,7 @@ public class MovieDetailActivity extends AppCompatActivity
                         if (intent.hasExtra(getString(R.string.key_movie_detail))) {
                             movieDetail = intent.getParcelableExtra(getString(R.string.key_movie_detail));
                             if (movieDetail == null)
-                                showError();
+                                finishWithError();
                             else
                                 bindMovieInfo();
                         } else {
@@ -236,7 +236,6 @@ public class MovieDetailActivity extends AppCompatActivity
         tvReleaseDate = findViewById(R.id.tv_release_date);
         tvGenres = findViewById(R.id.tv_genres);
         tvRating = findViewById(R.id.tv_rating);
-        tvMovieError = findViewById(R.id.tv_movie_error);
         tvMovieInfo = findViewById(R.id.tv_movie_info);
     }
 
@@ -252,7 +251,7 @@ public class MovieDetailActivity extends AppCompatActivity
 
     private void initTrailersRV(){
         rvTrailers.setHasFixedSize(true);
-        rvTrailers.setFocusable(false);
+        rvTrailers.setFocusable(true);
         rvTrailers.setNestedScrollingEnabled(true);
         trailerAdapter =  new TrailerAdapter(this);
         rvTrailers.setAdapter(trailerAdapter);
@@ -260,36 +259,6 @@ public class MovieDetailActivity extends AppCompatActivity
         helper.attachToRecyclerView(rvTrailers);
     }
 
-    private void showProgressBar() {
-        pbLoadingDetails.setVisibility(View.VISIBLE);
-//        detailsGroup.setVisibility(View.INVISIBLE);
-    }
-
-    private void showMovieInfo() {
-//        detailsGroup.setVisibility(View.VISIBLE);
-        tvMovieError.setVisibility(View.INVISIBLE);
-        pbLoadingDetails.setVisibility(View.INVISIBLE);
-    }
-
-    private void showError() {
-//        detailsGroup.setVisibility(View.INVISIBLE);
-        pbLoadingDetails.setVisibility(View.INVISIBLE);
-        tvMovieError.setVisibility(View.VISIBLE);
-    }
-
-    private void showSnackbar(final View parentView, String message, String action) {
-        Snackbar snackbar = Snackbar
-                .make(parentView, message, Snackbar.LENGTH_LONG)
-                .setAction(action, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Snackbar snackbar1 = Snackbar.make(parentView, "Message is restored!", Snackbar.LENGTH_SHORT);
-                        snackbar1.show();
-                    }
-                });
-
-        snackbar.show();
-    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
@@ -305,23 +274,25 @@ public class MovieDetailActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        fabFavorite.animate().alpha(0.0f).setDuration(90).setListener(new AnimatorListenerAdapter() {
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                supportFinishAfterTransition();
-                fabFavorite.setVisibility(View.GONE);
-            }
-        });
+        hideFabFavorite();
+        supportFinishAfterTransition();
+//        fabFavorite.animate().alpha(0.0f).setDuration(90).setListener(new AnimatorListenerAdapter() {
+//
+//            @Override
+//            public void onAnimationEnd(Animator animation) {
+//                super.onAnimationEnd(animation);
+//                supportFinishAfterTransition();
+//                fabFavorite.setVisibility(View.GONE);
+//            }
+//        });
     }
 
     @Override
-    public void finishAfterTransition() {
+    public void supportFinishAfterTransition() {
         Intent data = new Intent();
         data.putExtra(getString(R.string.transition_movie_poster), ivTransitionName);
         setResult(RESULT_OK, data);
-        super.finishAfterTransition();
+        super.supportFinishAfterTransition();
     }
 
     @Override
@@ -332,10 +303,6 @@ public class MovieDetailActivity extends AppCompatActivity
                 new int[] {svParent.getScrollX(), svParent.getScrollY()});
     }
 
-    private void showImageProgressBars() {
-        pbLoadingBackdrop.setVisibility(View.VISIBLE);
-        pbLoadingPoster.setVisibility(View.INVISIBLE);
-    }
 
     protected void bindMovieInfo() {
         MovieUtils.setFavoriteImageResource(this, fabFavorite,  movieDetail.getId());
@@ -344,15 +311,18 @@ public class MovieDetailActivity extends AppCompatActivity
         tvReleaseDate.setText(movieDetail.getReleaseDate());
         tvGenres.setText(movieDetail.getGenreNames());
         tvRating.setText(String.valueOf(movieDetail.getVoteAverage()) + "/10");
-        tvMovieInfo.setText(movieDetail.getOverview());
+        if (!movieDetail.getOverview().isEmpty()) {
+            tvMovieInfo.setText(movieDetail.getOverview());
+            findViewById(R.id.synopsis_layout).setVisibility(View.VISIBLE);
+        }
         if (isFavorite(this, movieDetail.getId()))
             fabFavorite.setImageResource(R.drawable.ic_star_orange_500_24dp);
         else
             fabFavorite.setImageResource(R.drawable.ic_star_border_orange_500_24dp);
+
         reviewAdapter.updateData(movieDetail.getReviewList().getReviews());
-        if (reviewAdapter.getItemCount() > 0) {
+        if (reviewAdapter.getItemCount() > 0)
             findViewById(R.id.reviews_layout).setVisibility(View.VISIBLE);
-        }
         String [] trailers = movieDetail.getTrailerKeys();
         if (trailers!= null && trailers.length > 0) {
             Log.i(TAG, "number of trailers = " + trailers.length);
@@ -360,8 +330,9 @@ public class MovieDetailActivity extends AppCompatActivity
         } else {
             rvTrailers.setVisibility(View.GONE);
         }
-        showMovieInfo();
-        showImageProgressBars();
+        pbLoadingDetails.setVisibility(View.INVISIBLE);
+        pbLoadingBackdrop.setVisibility(View.VISIBLE);
+        pbLoadingPoster.setVisibility(View.VISIBLE);
         Picasso.get()
                 .load(MediaUtils.buildPosterURL(movieDetail.getPosterPath(),
                         MediaUtils.measureWidth(ivMoviePoster)))
@@ -403,6 +374,7 @@ public class MovieDetailActivity extends AppCompatActivity
                     @Override
                     public void onError(Exception e) {
                         e.printStackTrace();
+                        showFABFavorite();
                         pbLoadingBackdrop.setVisibility(View.INVISIBLE);
                     }
                 });
@@ -431,7 +403,22 @@ public class MovieDetailActivity extends AppCompatActivity
         int vibrantColor = p.getVibrantColor(getResources().getColor(R.color.colorAccent));
         fabFavorite.setRippleColor(lightVibrantColor);
         fabFavorite.setBackgroundTintList(ColorStateList.valueOf(darkenColor(vibrantColor)));
+        showFABFavorite();
+    }
 
+    private void hideFabFavorite() {
+        fabFavorite.setAlpha(1.0f);
+        fabFavorite.setScaleX(1.0f);
+        fabFavorite.setScaleY(1.0f);
+        fabFavorite.animate().alpha(0.0f).scaleX(.3f).scaleY(.3f).setDuration(375).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                fabFavorite.setVisibility(View.INVISIBLE);
+            }
+        });
+    }
+    private void showFABFavorite() {
         fabFavorite.setAlpha(0.0f);
         fabFavorite.setScaleX(0.3f);
         fabFavorite.setScaleY(0.3f);

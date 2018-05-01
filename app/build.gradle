@@ -23,6 +23,8 @@ android {
             }
         }
     }
+    productFlavors {
+    }
 }
 
 ext {
@@ -33,13 +35,13 @@ ext {
 
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
     implementation "com.android.support:exifinterface:$supportLibraryVersion"
     implementation "com.android.support:support-v4:$supportLibraryVersion"
     implementation "com.android.support:design:$supportLibraryVersion"
     implementation "com.android.support:palette-v7:$supportLibraryVersion"
-    implementation "com.android.support.constraint:constraint-layout:1.1.0"
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
     implementation 'com.google.code.gson:gson:2.8.0'
     implementation "com.squareup.retrofit2:retrofit:$retrofitLibraryVersion"
@@ -47,8 +49,7 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation "com.jakewharton:butterknife:$buterknifeLibraryVersion"
     annotationProcessor "com.jakewharton:butterknife-compiler:$buterknifeLibraryVersion"
-    debugImplementation "com.squareup.okhttp3:logging-interceptor:3.10.0"
-
+    debugImplementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

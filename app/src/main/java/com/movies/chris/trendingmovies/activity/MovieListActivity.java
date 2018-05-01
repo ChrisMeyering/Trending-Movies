@@ -7,16 +7,19 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.preference.PreferenceManager;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.CoordinatorLayout;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.transition.Explode;
+import android.support.transition.Transition;
+import android.support.transition.TransitionManager;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -55,7 +58,6 @@ import com.movies.chris.trendingmovies.R;
 import com.movies.chris.trendingmovies.activity.UI.MovieListAdapter;
 import com.movies.chris.trendingmovies.activity.UI.Utility;
 import com.movies.chris.trendingmovies.data.provider.MoviesContract;
-import com.movies.chris.trendingmovies.data.tmdb.model.detail.MovieDetail;
 import com.movies.chris.trendingmovies.data.tmdb.model.list.MoviePoster;
 import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncJobService;
 import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncTask;
@@ -66,7 +68,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static java.util.concurrent.TimeUnit.HOURS;
-import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class MovieListActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor>,
@@ -89,14 +90,7 @@ public class MovieListActivity extends AppCompatActivity
     private static final String SORT_UPCOMING = MoviesContract.PATH_UPCOMING;
     private static final String SORT_FAVORITES = MoviesContract.PATH_FAVORITES;
     private static final String SORT_RECENT = MoviesContract.PATH_RECENT;
-    private boolean isLoading = false;
-    private boolean resetAnimation = true;
-    private SharedPreferences preferences;
     Parcelable layoutManagerSavedState = null;
-    private String sortBy;
-    private MovieListAdapter movieAdapter;
-    private int RV_VISIBLE_THRESHOLD = 7;
-
     @BindView(R.id.rv_movie_posters)
     RecyclerView rvMoviePosters;
     @BindView(R.id.pb_loading_movie_list)
@@ -111,8 +105,13 @@ public class MovieListActivity extends AppCompatActivity
     NavigationView navView;
     @BindView(R.id.et_search_by_name)
     EditText etSearchByName;
-
     ImageView sharedView = null;
+    private boolean isLoading = false;
+    private boolean resetAnimation = true;
+    private SharedPreferences preferences;
+    private String sortBy;
+    private MovieListAdapter movieAdapter;
+    private int RV_VISIBLE_THRESHOLD = 7;
     private RecyclerView.OnScrollListener rvScrollListener = new RecyclerView.OnScrollListener() {
         @Override
         public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -284,6 +283,7 @@ public class MovieListActivity extends AppCompatActivity
     }
 
     private void makeSortedMovieSearch(){
+        pbLoadingMovieList.setVisibility(View.VISIBLE);
         LoaderManager loaderManager = getSupportLoaderManager();
         int loaderID = getLoaderID();
         Loader<Cursor> cursorLoader = loaderManager.getLoader(loaderID);
@@ -596,6 +596,7 @@ public class MovieListActivity extends AppCompatActivity
     public void onClick(ImageView sharedView, MoviePoster poster) {
         etSearchByName.clearFocus();
         Utility.hideKeyboard(MovieListActivity.this, getCurrentFocus().getWindowToken());
+
         int viewId = sharedView.getId();
         switch (viewId) {
             case R.id.iv_poster:
@@ -619,8 +620,6 @@ public class MovieListActivity extends AppCompatActivity
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                 MovieListActivity.this, p1, p2);
         startActivityForResult(detailIntent, MovieDetailActivity.REQUEST_MOVIE_DETAIL, options.toBundle());
-        pbLoadingMovieList.bringToFront();
-
     }
 
     @Override
