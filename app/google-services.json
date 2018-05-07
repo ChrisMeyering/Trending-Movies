@@ -1,0 +1,104 @@
+{
+  "project_info": {
+    "project_number": "386309684769",
+    "firebase_url": "https://trending-movies-200919.firebaseio.com",
+    "project_id": "trending-movies-200919",
+    "storage_bucket": "trending-movies-200919.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:386309684769:android:146ed52ab2ddce61",
+        "android_client_info": {
+          "package_name": "com.movies.chris.trendingmovies"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "386309684769-9jud1uivbbgdbvq10f82rkibdcinlgkc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBx8KJ3SojePjx7KtjfBBE9E5BPy1HKp1I"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:386309684769:android:feb1417a26e422d2",
+        "android_client_info": {
+          "package_name": "com.movies.chris.trendingmovies.free"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "386309684769-9jud1uivbbgdbvq10f82rkibdcinlgkc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBx8KJ3SojePjx7KtjfBBE9E5BPy1HKp1I"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:386309684769:android:eaec2e9463b43778",
+        "android_client_info": {
+          "package_name": "com.movies.chris.trendingmovies.paid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "386309684769-9jud1uivbbgdbvq10f82rkibdcinlgkc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBx8KJ3SojePjx7KtjfBBE9E5BPy1HKp1I"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

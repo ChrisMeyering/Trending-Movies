@@ -113,7 +113,6 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
         @BindView(R.id.pb_loading_movie_poster)
         ProgressBar pbLoadingPoster;
         MoviePoster poster;
-        int width;
         public PosterViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
@@ -138,7 +137,6 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
 
                 }
             });
-            width = MediaUtils.measureWidth(view);
 
         }
 
@@ -157,7 +155,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Post
             ViewCompat.setTransitionName(fabFavorite, FAB_TRANSITION_BASE + position);
             MovieUtils.setFavoriteImageResource(context, fabFavorite, poster.id);
             pbLoadingPoster.setVisibility(View.VISIBLE);
-            Picasso.get().load(MediaUtils.buildPosterURL(poster.posterPath, width))
+            Picasso.get().load(MediaUtils.buildPosterURL(poster.posterPath, MediaUtils.measureWidth(ivPoster)))
                     .placeholder(R.drawable.poster_placeholder)
                     .error(R.drawable.error)
                     .into(ivPoster, new Callback() {

@@ -10,6 +10,7 @@ android {
         versionName "1.0"
         buildConfigField("String", "TMDB_API_KEY", TMDBApiKey)
         buildConfigField("String", "YOUTUBE_API_KEY", YoutubeApiKey)
+        buildConfigField("String", "WEB_CLIENT_ID", GoogleWebClientId);
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -23,7 +24,14 @@ android {
             }
         }
     }
+    flavorDimensions "default"
     productFlavors {
+        free {
+            applicationId 'com.movies.chris.trendingmovies.free'
+        }
+        paid {
+            applicationId 'com.movies.chris.trendingmovies.paid'
+        }
     }
 }
 
@@ -43,6 +51,7 @@ dependencies {
     implementation "com.android.support:palette-v7:$supportLibraryVersion"
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
+    implementation 'com.google.firebase:firebase-auth:15.1.0'
     implementation 'com.google.code.gson:gson:2.8.0'
     implementation "com.squareup.retrofit2:retrofit:$retrofitLibraryVersion"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitLibraryVersion"
@@ -50,7 +59,12 @@ dependencies {
     implementation "com.jakewharton:butterknife:$buterknifeLibraryVersion"
     annotationProcessor "com.jakewharton:butterknife-compiler:$buterknifeLibraryVersion"
     debugImplementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
+    freeImplementation 'com.google.android.gms:play-services-ads:15.0.1'
+    implementation 'com.google.android.gms:play-services-auth:15.0.1'
+    implementation 'com.google.firebase:firebase-core:15.0.2'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
+
+apply plugin: 'com.google.gms.google-services'

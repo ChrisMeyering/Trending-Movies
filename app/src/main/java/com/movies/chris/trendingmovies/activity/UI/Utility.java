@@ -14,7 +14,7 @@ public class Utility {
     public static int numOfGridColumns(Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        return Math.max((int) (dpWidth / 300), 3);
+        return Math.max((int) (dpWidth / 130), 3);
     }
 
     public static void hideKeyboard(Context context, IBinder binder) {

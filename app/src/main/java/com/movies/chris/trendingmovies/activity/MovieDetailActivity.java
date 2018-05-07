@@ -251,7 +251,7 @@ public class MovieDetailActivity extends AppCompatActivity
 
     private void initTrailersRV(){
         rvTrailers.setHasFixedSize(true);
-        rvTrailers.setFocusable(true);
+        rvTrailers.setFocusable(false);
         rvTrailers.setNestedScrollingEnabled(true);
         trailerAdapter =  new TrailerAdapter(this);
         rvTrailers.setAdapter(trailerAdapter);
