@@ -14,23 +14,13 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MovieList implements Parcelable
-{
+public class MovieList implements Parcelable {
 
-    @SerializedName("page")
-    @Expose
-    public Integer page;
-    @SerializedName("total_pages")
-    @Expose
-    public Integer totalPages;
-    @SerializedName("results")
-    @Expose
-    public List<MoviePoster> moviePosters = null;
     public final static Parcelable.Creator<MovieList> CREATOR = new Creator<MovieList>() {
 
 
         @SuppressWarnings({
-            "unchecked"
+                "unchecked"
         })
         public MovieList createFromParcel(Parcel in) {
             return new MovieList(in);
@@ -40,8 +30,16 @@ public class MovieList implements Parcelable
             return (new MovieList[size]);
         }
 
-    }
-    ;
+    };
+    @SerializedName("page")
+    @Expose
+    public Integer page;
+    @SerializedName("total_pages")
+    @Expose
+    public Integer totalPages;
+    @SerializedName("results")
+    @Expose
+    public List<MoviePoster> moviePosters = null;
 
     protected MovieList(Parcel in) {
         this.page = ((Integer) in.readValue((Integer.class.getClassLoader())));
@@ -57,6 +55,7 @@ public class MovieList implements Parcelable
         dest.writeValue(totalPages);
         dest.writeList(moviePosters);
     }
+
     private ContentValues[] getPosterListContentValues() {
         List<ContentValues> posterValues = new ArrayList<>();
         for (MoviePoster moviePoster : moviePosters) {
@@ -80,8 +79,9 @@ public class MovieList implements Parcelable
         }
         return -1;
     }
+
     public int describeContents() {
-        return  0;
+        return 0;
     }
 
 }

@@ -1,4 +1,3 @@
-
 package com.movies.chris.trendingmovies.data.tmdb.model.list;
 
 import android.content.ContentValues;
@@ -14,21 +13,14 @@ import com.google.gson.annotations.SerializedName;
 import com.movies.chris.trendingmovies.data.provider.MoviesContract;
 import com.movies.chris.trendingmovies.utils.MovieUtils;
 
-public class MoviePoster implements Parcelable
-{
+public class MoviePoster implements Parcelable {
 
     public static final String TAG = MoviePoster.class.getSimpleName();
-    @SerializedName("id")
-    @Expose
-    public Integer id;
-    @SerializedName("poster_path")
-    @Expose
-    public String posterPath;
     public final static Parcelable.Creator<MoviePoster> CREATOR = new Creator<MoviePoster>() {
 
 
         @SuppressWarnings({
-            "unchecked"
+                "unchecked"
         })
         public MoviePoster createFromParcel(Parcel in) {
             return new MoviePoster(in);
@@ -38,8 +30,13 @@ public class MoviePoster implements Parcelable
             return (new MoviePoster[size]);
         }
 
-    }
-    ;
+    };
+    @SerializedName("id")
+    @Expose
+    public Integer id;
+    @SerializedName("poster_path")
+    @Expose
+    public String posterPath;
 
     protected MoviePoster(Parcel in) {
         this.id = ((Integer) in.readValue((Integer.class.getClassLoader())));
@@ -48,14 +45,10 @@ public class MoviePoster implements Parcelable
 
     public MoviePoster() {
     }
+
     public MoviePoster(int id, String posterPath) {
         this.id = id;
         this.posterPath = posterPath;
-    }
-
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(id);
-        dest.writeValue(posterPath);
     }
 
     public static MoviePoster getPoster(Cursor cursor) {
@@ -63,6 +56,12 @@ public class MoviePoster implements Parcelable
                 cursor.getInt(cursor.getColumnIndex(MoviesContract.MOVIE_ID)),
                 cursor.getString(cursor.getColumnIndex(MoviesContract.POSTER_PATH)));
     }
+
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(id);
+        dest.writeValue(posterPath);
+    }
+
     public ContentValues getPosterContentValues() {
         ContentValues posterValues = new ContentValues();
         posterValues.put(MoviesContract.POSTER_PATH, posterPath);
@@ -93,6 +92,7 @@ public class MoviePoster implements Parcelable
                 .build();
         context.getContentResolver().delete(uri, null, null);
     }
+
     public void saveToRecents(Context context) {
         saveMovie(context, MoviesContract.RecentEntry.CONTENT_URI);
     }
@@ -103,7 +103,7 @@ public class MoviePoster implements Parcelable
 
 
     public int describeContents() {
-        return  0;
+        return 0;
     }
 
 }

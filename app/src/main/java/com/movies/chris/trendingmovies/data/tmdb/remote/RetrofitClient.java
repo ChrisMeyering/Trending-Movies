@@ -1,5 +1,4 @@
 package com.movies.chris.trendingmovies.data.tmdb.remote;
-
 /**
  * Created by chris on 3/2/18.
  */
@@ -25,11 +24,10 @@ public class RetrofitClient {
     private static final String DEFAULT_LANGUAGE = "en-US";
     private static Retrofit retrofit = null;
 
-    public static Retrofit getClient(String baseUrl){
+    public static Retrofit getClient(String baseUrl) {
         if (retrofit == null) {
             HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-
             Interceptor authInterceptor = new Interceptor() {
                 @Override
                 public Response intercept(Chain chain) throws IOException {
@@ -43,12 +41,10 @@ public class RetrofitClient {
 
                 }
             };
-
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
                     .addInterceptor(loggingInterceptor)
                     .addInterceptor(authInterceptor)
                     .build();
-
             retrofit = new Retrofit.Builder()
                     .baseUrl(baseUrl)
                     .client(okHttpClient)

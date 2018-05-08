@@ -1,4 +1,3 @@
-
 package com.movies.chris.trendingmovies.data.tmdb.model;
 
 import android.os.Parcel;
@@ -7,20 +6,13 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Genre implements Parcelable
-{
+public class Genre implements Parcelable {
 
-    @SerializedName("id")
-    @Expose
-    private Integer id;
-    @SerializedName("name")
-    @Expose
-    private String name;
     public final static Parcelable.Creator<Genre> CREATOR = new Creator<Genre>() {
 
 
         @SuppressWarnings({
-            "unchecked"
+                "unchecked"
         })
         public Genre createFromParcel(Parcel in) {
             return new Genre(in);
@@ -30,8 +22,13 @@ public class Genre implements Parcelable
             return (new Genre[size]);
         }
 
-    }
-    ;
+    };
+    @SerializedName("id")
+    @Expose
+    private Integer id;
+    @SerializedName("name")
+    @Expose
+    private String name;
 
     protected Genre(Parcel in) {
         this.id = ((Integer) in.readValue((Integer.class.getClassLoader())));
@@ -40,13 +37,11 @@ public class Genre implements Parcelable
 
     /**
      * No args constructor for use in serialization
-     * 
      */
     public Genre() {
     }
 
     /**
-     * 
      * @param id
      * @param name
      */
@@ -79,7 +74,7 @@ public class Genre implements Parcelable
     }
 
     public int describeContents() {
-        return  0;
+        return 0;
     }
 
 }

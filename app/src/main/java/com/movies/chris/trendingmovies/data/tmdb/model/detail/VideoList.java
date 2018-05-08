@@ -1,4 +1,3 @@
-
 package com.movies.chris.trendingmovies.data.tmdb.model.detail;
 
 import android.os.Parcel;
@@ -10,17 +9,13 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VideoList implements Parcelable
-{
+public class VideoList implements Parcelable {
 
-    @SerializedName("results")
-    @Expose
-    private List<Video> videos = null;
     public final static Parcelable.Creator<VideoList> CREATOR = new Creator<VideoList>() {
 
 
         @SuppressWarnings({
-            "unchecked"
+                "unchecked"
         })
         public VideoList createFromParcel(Parcel in) {
             return new VideoList(in);
@@ -30,8 +25,10 @@ public class VideoList implements Parcelable
             return (new VideoList[size]);
         }
 
-    }
-    ;
+    };
+    @SerializedName("results")
+    @Expose
+    private List<Video> videos = null;
 
     protected VideoList(Parcel in) {
         this.videos = new ArrayList<>();
@@ -54,7 +51,7 @@ public class VideoList implements Parcelable
     }
 
     public int describeContents() {
-        return  0;
+        return 0;
     }
 
 }

@@ -11,7 +11,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -32,9 +31,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -53,7 +49,6 @@ import com.squareup.picasso.Picasso;
 
 import static com.movies.chris.trendingmovies.utils.MovieUtils.getFavoriteImageResource;
 import static com.movies.chris.trendingmovies.utils.MovieUtils.isFavorite;
-import static com.movies.chris.trendingmovies.utils.MovieUtils.swapFavoriteImageResource;
 
 
 public class MovieDetailActivity extends AppCompatActivity
@@ -109,7 +104,7 @@ public class MovieDetailActivity extends AppCompatActivity
         }
     };
 
-    private void finishWithError(){
+    private void finishWithError() {
         Intent data = new Intent();
         setResult(movieID, data);
         finishActivity(REQUEST_MOVIE_DETAIL);
@@ -146,7 +141,7 @@ public class MovieDetailActivity extends AppCompatActivity
             if (startIntent.hasExtra(getString(R.string.transition_movie_poster)))
                 ivTransitionName = startIntent.getStringExtra(getString(R.string.transition_movie_poster));
             if (startIntent.hasExtra(getString(R.string.key_movie_id))) {
-                movieID = startIntent.getIntExtra(getString(R.string.key_movie_id),0);
+                movieID = startIntent.getIntExtra(getString(R.string.key_movie_id), 0);
                 pbLoadingDetails.setVisibility(View.VISIBLE);
                 MoviesSyncUtils.getTmdbMovieDetail(this, movieID);
             }
@@ -164,9 +159,8 @@ public class MovieDetailActivity extends AppCompatActivity
 //        int resID = swapFavoriteImageResource(this, fabFavorite,
 //                movieDetail.getId(),
 //                movieDetail.getPosterPath());
-
         final MoviePoster poster = new MoviePoster(movieDetail.getId(), movieDetail.getPosterPath());
-        if (MovieUtils.swapFavoriteImageResource(this, fabFavorite, poster)){
+        if (MovieUtils.swapFavoriteImageResource(this, fabFavorite, poster)) {
             Snackbar snackbar = Snackbar
                     .make(svParent, "Movie saved to Favorites", Snackbar.LENGTH_LONG)
                     .setAction("UNDO", new View.OnClickListener() {
@@ -223,8 +217,7 @@ public class MovieDetailActivity extends AppCompatActivity
         pbLoadingPoster = findViewById(R.id.pb_loading_poster);
         collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar_layout);
         collapsingToolbarLayout.setCollapsedTitleGravity(Gravity.START);
-        collapsingToolbarLayout.setExpandedTitleGravity(Gravity.BOTTOM|Gravity.END);
-
+        collapsingToolbarLayout.setExpandedTitleGravity(Gravity.BOTTOM | Gravity.END);
         pbLoadingDetails = findViewById(R.id.pb_loading_details);
         fabFavorite = findViewById(R.id.fab_favorite);
         fabFavorite.setOnClickListener(new View.OnClickListener() {
@@ -249,11 +242,11 @@ public class MovieDetailActivity extends AppCompatActivity
         rvReviews.setAdapter(reviewAdapter);
     }
 
-    private void initTrailersRV(){
+    private void initTrailersRV() {
         rvTrailers.setHasFixedSize(true);
         rvTrailers.setFocusable(false);
         rvTrailers.setNestedScrollingEnabled(true);
-        trailerAdapter =  new TrailerAdapter(this);
+        trailerAdapter = new TrailerAdapter(this);
         rvTrailers.setAdapter(trailerAdapter);
         SnapHelper helper = new LinearSnapHelper();
         helper.attachToRecyclerView(rvTrailers);
@@ -261,7 +254,7 @@ public class MovieDetailActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
+        switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
                 return true;
@@ -300,12 +293,12 @@ public class MovieDetailActivity extends AppCompatActivity
         super.onSaveInstanceState(outState);
         outState.putParcelable(getString(R.string.key_movie_detail), movieDetail);
         outState.putIntArray(getString(R.string.key_scroll_view_postition),
-                new int[] {svParent.getScrollX(), svParent.getScrollY()});
+                new int[]{svParent.getScrollX(), svParent.getScrollY()});
     }
 
 
     protected void bindMovieInfo() {
-        MovieUtils.setFavoriteImageResource(this, fabFavorite,  movieDetail.getId());
+        MovieUtils.setFavoriteImageResource(this, fabFavorite, movieDetail.getId());
         ViewCompat.setTransitionName(ivMoviePoster, ivTransitionName);
         collapsingToolbarLayout.setTitle(movieDetail.getTitle());
         tvReleaseDate.setText(movieDetail.getReleaseDate());
@@ -319,12 +312,11 @@ public class MovieDetailActivity extends AppCompatActivity
             fabFavorite.setImageResource(R.drawable.ic_star_orange_500_24dp);
         else
             fabFavorite.setImageResource(R.drawable.ic_star_border_orange_500_24dp);
-
         reviewAdapter.updateData(movieDetail.getReviewList().getReviews());
         if (reviewAdapter.getItemCount() > 0)
             findViewById(R.id.reviews_layout).setVisibility(View.VISIBLE);
-        String [] trailers = movieDetail.getTrailerKeys();
-        if (trailers!= null && trailers.length > 0) {
+        String[] trailers = movieDetail.getTrailerKeys();
+        if (trailers != null && trailers.length > 0) {
             Log.i(TAG, "number of trailers = " + trailers.length);
             trailerAdapter.setData(trailers);
         } else {
@@ -345,6 +337,7 @@ public class MovieDetailActivity extends AppCompatActivity
                         pbLoadingPoster.setVisibility(View.INVISIBLE);
                         supportStartPostponedEnterTransition();
                     }
+
                     @Override
                     public void onError(Exception e) {
                         e.printStackTrace();
@@ -371,6 +364,7 @@ public class MovieDetailActivity extends AppCompatActivity
                         }
                         pbLoadingBackdrop.setVisibility(View.INVISIBLE);
                     }
+
                     @Override
                     public void onError(Exception e) {
                         e.printStackTrace();
@@ -418,6 +412,7 @@ public class MovieDetailActivity extends AppCompatActivity
             }
         });
     }
+
     private void showFABFavorite() {
         fabFavorite.setAlpha(0.0f);
         fabFavorite.setScaleX(0.3f);

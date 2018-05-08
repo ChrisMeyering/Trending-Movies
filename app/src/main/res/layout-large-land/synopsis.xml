@@ -2,8 +2,8 @@
 
 <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:visibility="invisible"
-    style="@style/FramedItemLayout">
+    style="@style/FramedItemLayout"
+    android:visibility="invisible">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"

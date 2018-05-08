@@ -8,17 +8,13 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class GenreList implements Parcelable
-{
+public class GenreList implements Parcelable {
 
-    @SerializedName("genres")
-    @Expose
-    private List<Genre> genres = null;
     public final static Parcelable.Creator<GenreList> CREATOR = new Creator<GenreList>() {
 
 
         @SuppressWarnings({
-            "unchecked"
+                "unchecked"
         })
         public GenreList createFromParcel(Parcel in) {
             return new GenreList(in);
@@ -28,8 +24,10 @@ public class GenreList implements Parcelable
             return (new GenreList[size]);
         }
 
-    }
-    ;
+    };
+    @SerializedName("genres")
+    @Expose
+    private List<Genre> genres = null;
 
     protected GenreList(Parcel in) {
         in.readList(this.genres, (Genre.class.getClassLoader()));
@@ -51,7 +49,7 @@ public class GenreList implements Parcelable
     }
 
     public int describeContents() {
-        return  0;
+        return 0;
     }
 
 }

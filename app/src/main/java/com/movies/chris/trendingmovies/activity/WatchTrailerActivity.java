@@ -18,12 +18,12 @@ import butterknife.ButterKnife;
 
 public class WatchTrailerActivity
         extends YouTubeBaseActivity
-        implements YouTubePlayer.OnInitializedListener
-{
+        implements YouTubePlayer.OnInitializedListener {
     @BindView(R.id.youtube_player)
     YouTubePlayerView youtubePlayerView;
     YouTubePlayer youTubePlayer;
     String trailerKey = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +49,6 @@ public class WatchTrailerActivity
         youTubePlayer.setPlayerStateChangeListener(new YouTubePlayer.PlayerStateChangeListener() {
             @Override
             public void onLoading() {
-
             }
 
             @Override
@@ -59,22 +58,18 @@ public class WatchTrailerActivity
 
             @Override
             public void onAdStarted() {
-
             }
 
             @Override
             public void onVideoStarted() {
-
             }
 
             @Override
             public void onVideoEnded() {
-
             }
 
             @Override
             public void onError(YouTubePlayer.ErrorReason errorReason) {
-
             }
         });
         if (trailerKey != null) {

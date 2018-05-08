@@ -17,7 +17,6 @@ import android.util.Log;
 
 public class MoviesProvider extends ContentProvider {
 
-    private static final String TAG = MoviesProvider.class.getSimpleName();
     public static final int CODE_FAVORITES = 100;
     public static final int CODE_FAVORITES_WITH_ID = 101;
     public static final int CODE_RECENT = 200;
@@ -29,33 +28,27 @@ public class MoviesProvider extends ContentProvider {
     public static final int CODE_MOVIE_NAME = 700;
     public static final int CODE_GENRE_IDS = 800;
     public static final int CODE_GENRE_IDS_WITH_ID = 801;
+    private static final String TAG = MoviesProvider.class.getSimpleName();
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private MoviesDbHelper mOpenHelper;
 
-//TODO
+    //TODO
     public static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_FAVORITES, CODE_FAVORITES);
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_FAVORITES + "/#", CODE_FAVORITES_WITH_ID);
-
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_RECENT, CODE_RECENT);
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_RECENT + "/#", CODE_RECENT_WITH_ID);
-
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_TOP_RATED, CODE_TOP_RATED);
-
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_POPULAR, CODE_POPULAR);
-
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_NOW_PLAYING, CODE_NOW_PLAYING);
-
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_UPCOMING, CODE_UPCOMING);
-
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_MOVIE_NAME, CODE_MOVIE_NAME);
-
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_GENRE_IDS, CODE_GENRE_IDS);
         matcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_GENRE_IDS + "/#", CODE_GENRE_IDS_WITH_ID);
-
         return matcher;
     }
+
     @Override
     public boolean onCreate() {
         mOpenHelper = new MoviesDbHelper(getContext());
@@ -71,7 +64,6 @@ public class MoviesProvider extends ContentProvider {
                         @Nullable String sortOrder) {
         Cursor cursor;
         String tableName = getTableName(uri);
-
         cursor = mOpenHelper.getReadableDatabase().query(
                 tableName,
                 projection,
@@ -125,7 +117,7 @@ public class MoviesProvider extends ContentProvider {
         String tableName = getTableName(uri);
         int rowsInserted = 0;
         db.beginTransaction();
-        for (ContentValues value:values) {
+        for (ContentValues value : values) {
             Log.i(TAG, value.toString());
         }
         try {
@@ -142,7 +134,7 @@ public class MoviesProvider extends ContentProvider {
         } finally {
             db.endTransaction();
         }
-        if(rowsInserted > 0) {
+        if (rowsInserted > 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
         return rowsInserted;
@@ -153,7 +145,6 @@ public class MoviesProvider extends ContentProvider {
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         String tableName = getTableName(uri);
-
         long _id = db.insert(tableName,
                 null,
                 values);
@@ -195,7 +186,6 @@ public class MoviesProvider extends ContentProvider {
                                 selectionArgs);
                 break;
         }
-
         if (numRowsDeleted != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }

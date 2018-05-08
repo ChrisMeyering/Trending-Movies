@@ -3,9 +3,9 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cl_details"
+    style="@style/FramedItemLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    style="@style/FramedItemLayout"
     android:padding="12dp">
 
     <!--android:transitionName="@string/transition_movie_poster"-->

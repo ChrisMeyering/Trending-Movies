@@ -3,7 +3,6 @@ package com.movies.chris.trendingmovies.utils;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 
@@ -13,7 +12,7 @@ import com.movies.chris.trendingmovies.data.tmdb.model.list.MoviePoster;
 
 public class MovieUtils {
 
-    public static boolean isFavorite (Context context, int movieID) {
+    public static boolean isFavorite(Context context, int movieID) {
         Cursor c = context.getContentResolver().query(MoviesContract.FavoritesEntry.CONTENT_URI,
                 null,
                 MoviesContract.FavoritesEntry.getFavoritesWithIdSelection(),
@@ -25,7 +24,7 @@ public class MovieUtils {
         return ret;
     }
 
-    public static boolean isRecent (Context context, int movieID) {
+    public static boolean isRecent(Context context, int movieID) {
         Cursor c = context.getContentResolver().query(MoviesContract.RecentEntry.CONTENT_URI,
                 null,
                 MoviesContract.RecentEntry.getRecentsWithIdSelection(),
@@ -52,21 +51,23 @@ public class MovieUtils {
 
     public static int getFavoriteImageResource(Context context, int movieId) {
         return isFavorite(context, movieId) ?
-                R.drawable.ic_star_orange_500_24dp:
+                R.drawable.ic_star_orange_500_24dp :
                 R.drawable.ic_star_border_orange_500_24dp;
     }
-    public static void setFavoriteImageResource(Context context, FloatingActionButton fab, int movieId){
+
+    public static void setFavoriteImageResource(Context context, FloatingActionButton fab, int movieId) {
         if (isFavorite(context, movieId)) {
             fab.setImageResource(R.drawable.ic_star_orange_500_24dp);
         } else {
             fab.setImageResource(R.drawable.ic_star_border_orange_500_24dp);
         }
     }
-    public static boolean swapFavoriteImageResource(Context context, FloatingActionButton fab, MoviePoster moviePoster){
+
+    public static boolean swapFavoriteImageResource(Context context, FloatingActionButton fab, MoviePoster moviePoster) {
         return swapFavoriteImageResource(context, fab, moviePoster.id, moviePoster.posterPath) == R.drawable.ic_star_orange_500_24dp;
     }
 
-    public static int swapFavoriteImageResource(Context context, FloatingActionButton fab, int movieId, String posterPath){
+    public static int swapFavoriteImageResource(Context context, FloatingActionButton fab, int movieId, String posterPath) {
         int resourceID;
         if (isFavorite(context, movieId)) {
             fab.setImageResource(R.drawable.ic_star_border_orange_500_24dp);

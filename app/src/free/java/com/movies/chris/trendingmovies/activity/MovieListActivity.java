@@ -70,8 +70,7 @@ import static java.util.concurrent.TimeUnit.HOURS;
 public class MovieListActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor>,
         NavigationView.OnNavigationItemSelectedListener,
-        MovieListAdapter.MovieAdapterClickHandler
-{
+        MovieListAdapter.MovieAdapterClickHandler {
 
     private static final String TAG = MovieListActivity.class.getSimpleName();
     private static final int LOADER_FAVORITES_ID = 11;
@@ -153,7 +152,7 @@ public class MovieListActivity extends AppCompatActivity
                     //duplicate movie ids (it has at least two different lists for the same url
                     //aka: two identical urls can have different results
                     if (itemCount >= 100 &&
-                            itemCount%Utility.numOfGridColumns(MovieListActivity.this) ==0)
+                            itemCount % Utility.numOfGridColumns(MovieListActivity.this) == 0)
                         break;
                 default:
                     isLoading = true;
@@ -172,17 +171,17 @@ public class MovieListActivity extends AppCompatActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() != null)
-            switch (intent.getAction()) {
-                case MoviesSyncTask.EVENT_SYNC_COMPLETE:
-                    if (intent.getBooleanExtra(getString(R.string.key_sync_success), false)) {
-                        Log.i(TAG, "Sync successful");
-                        movieAdapter.notifyDataSetChanged();
-                    } else {
-                        Log.i(TAG, "Error: Sync failed");
-                    }
-                    isLoading = false;
-                    break;
-            }
+                switch (intent.getAction()) {
+                    case MoviesSyncTask.EVENT_SYNC_COMPLETE:
+                        if (intent.getBooleanExtra(getString(R.string.key_sync_success), false)) {
+                            Log.i(TAG, "Sync successful");
+                            movieAdapter.notifyDataSetChanged();
+                        } else {
+                            Log.i(TAG, "Error: Sync failed");
+                        }
+                        isLoading = false;
+                        break;
+                }
         }
     };
 
@@ -218,7 +217,7 @@ public class MovieListActivity extends AppCompatActivity
                 .setTag(MoviesSyncJobService.ACTION_START_DELETION)
                 .setRecurring(true)
                 .setReplaceCurrent(false)
-                .setTrigger(Trigger.executionWindow((int)HOURS.toSeconds(4),(int)HOURS.toSeconds(7)))
+                .setTrigger(Trigger.executionWindow((int) HOURS.toSeconds(4), (int) HOURS.toSeconds(7)))
                 .setConstraints(Constraint.ON_ANY_NETWORK, Constraint.DEVICE_IDLE)
                 .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
                 .build();
@@ -259,7 +258,7 @@ public class MovieListActivity extends AppCompatActivity
     }
 
     private int getLoaderID() {
-        switch(sortBy) {
+        switch (sortBy) {
             case SORT_BY_RATING:
                 return LOADER_TOP_RATED_ID;
             case SORT_BY_POPULARITY:
@@ -278,7 +277,7 @@ public class MovieListActivity extends AppCompatActivity
     }
 
     private Uri getQueryUri() {
-        switch(sortBy) {
+        switch (sortBy) {
             case SORT_BY_RATING:
                 return MoviesContract.TopRatedEntry.CONTENT_URI;
             case SORT_BY_POPULARITY:
@@ -296,7 +295,7 @@ public class MovieListActivity extends AppCompatActivity
         }
     }
 
-    private void makeSortedMovieSearch(){
+    private void makeSortedMovieSearch() {
         pbLoadingMovieList.setVisibility(View.VISIBLE);
         LoaderManager loaderManager = getSupportLoaderManager();
         int loaderID = getLoaderID();
@@ -316,7 +315,7 @@ public class MovieListActivity extends AppCompatActivity
         etSearchByName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH ){
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     etSearchByName.clearFocus();
                     Utility.hideKeyboard(MovieListActivity.this, getCurrentFocus().getWindowToken());
                     String search = etSearchByName.getText().toString().trim();
@@ -436,7 +435,7 @@ public class MovieListActivity extends AppCompatActivity
         etSearchByName.clearFocus();
         Utility.hideKeyboard(this, getCurrentFocus().getWindowToken());
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_sign_out) {
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -582,7 +581,7 @@ public class MovieListActivity extends AppCompatActivity
 
     @Override
     public void onClick(final FloatingActionButton fab, final MoviePoster poster) {
-        if (MovieUtils.swapFavoriteImageResource(this, fab, poster)){
+        if (MovieUtils.swapFavoriteImageResource(this, fab, poster)) {
             Snackbar snackbar = Snackbar
                     .make(rvMoviePosters, "Movie saved to Favorites", Snackbar.LENGTH_LONG)
                     .setAction("UNDO", new View.OnClickListener() {
@@ -610,14 +609,13 @@ public class MovieListActivity extends AppCompatActivity
     public void onClick(ImageView sharedView, final MoviePoster poster) {
         etSearchByName.clearFocus();
         Utility.hideKeyboard(MovieListActivity.this, getCurrentFocus().getWindowToken());
-
         int viewId = sharedView.getId();
         switch (viewId) {
             case R.id.iv_poster:
                 this.sharedView = sharedView;
-                if(mInterstitialAd.isLoaded()) {
+                if (mInterstitialAd.isLoaded()) {
                     mInterstitialAd.show();
-                    mInterstitialAd.setAdListener(new AdListener(){
+                    mInterstitialAd.setAdListener(new AdListener() {
                         @Override
                         public void onAdClosed() {
                             super.onAdClosed();
@@ -645,14 +643,13 @@ public class MovieListActivity extends AppCompatActivity
     @SuppressLint("RestrictedApi")
     private void startDetailActivity(Integer id) {
         pbLoadingMovieList.setVisibility(View.VISIBLE);
-
         Intent detailIntent = new Intent(MovieListActivity.this, MovieDetailActivity.class);
         String imageTransitionName = ViewCompat.getTransitionName(sharedView);
         String progressTransitionName = ViewCompat.getTransitionName(pbLoadingMovieList);
         detailIntent.putExtra(getString(R.string.key_movie_id), id);
         detailIntent.putExtra(getString(R.string.transition_movie_poster), imageTransitionName);
-        Pair<View, String> p1 = Pair.create((View)sharedView, imageTransitionName);
-        Pair<View, String> p2 = Pair.create((View)pbLoadingMovieList, progressTransitionName);
+        Pair<View, String> p1 = Pair.create((View) sharedView, imageTransitionName);
+        Pair<View, String> p2 = Pair.create((View) pbLoadingMovieList, progressTransitionName);
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                 MovieListActivity.this, p1, p2);
         startActivityForResult(detailIntent, MovieDetailActivity.REQUEST_MOVIE_DETAIL, options.toBundle());
@@ -661,8 +658,7 @@ public class MovieListActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, final int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode==MovieDetailActivity.REQUEST_MOVIE_DETAIL && resultCode != RESULT_OK) {
+        if (requestCode == MovieDetailActivity.REQUEST_MOVIE_DETAIL && resultCode != RESULT_OK) {
             new Handler().post(new Runnable() {
                 @Override
                 public void run() {

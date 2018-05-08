@@ -65,7 +65,7 @@ public class MediaUtils {
     }
 
     public static int measureWidth(View view) {
-        view.measure(View.MeasureSpec.UNSPECIFIED,View.MeasureSpec.UNSPECIFIED);
+        view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         return view.getMeasuredWidth();
     }
 }

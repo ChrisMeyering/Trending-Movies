@@ -18,8 +18,8 @@
         android:layout_height="80dp"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:adjustViewBounds="true"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/powered_by_square_tmdb_green" />
 
     <ProgressBar
@@ -27,47 +27,48 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageView
         android:id="@+id/iv_user_picture"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_margin="4dp"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="@id/iv_powered_by_tmdb"
         app:layout_constraintBottom_toBottomOf="@id/iv_powered_by_tmdb"
         app:layout_constraintStart_toStartOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="@id/iv_powered_by_tmdb" />
+
     <TextView
         android:id="@+id/tv_user_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:text="@string/nav_header_title"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/iv_powered_by_tmdb"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_powered_by_tmdb" />
 
     <TextView
         android:id="@+id/tv_user_email"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_user_name"
+        android:text="@string/nav_header_subtitle"
         android:visibility="gone"
-        android:text="@string/nav_header_subtitle" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_user_name" />
+
     <com.google.android.gms.common.SignInButton
         android:id="@+id/btn_google_signin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
-    </com.google.android.gms.common.SignInButton>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"></com.google.android.gms.common.SignInButton>
 
 </android.support.constraint.ConstraintLayout>

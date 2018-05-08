@@ -20,7 +20,7 @@
             android:title="@string/action_upcoming" />
         <item
             android:id="@+id/action_view_recents"
-            android:title="@string/action_recents"/>
+            android:title="@string/action_recents" />
         <item
             android:id="@+id/action_view_favorites"
             android:icon="@android:drawable/btn_star_big_off"

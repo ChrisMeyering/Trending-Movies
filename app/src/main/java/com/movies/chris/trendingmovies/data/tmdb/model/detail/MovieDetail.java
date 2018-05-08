@@ -1,4 +1,3 @@
-
 package com.movies.chris.trendingmovies.data.tmdb.model.detail;
 
 import android.os.Parcel;
@@ -12,9 +11,23 @@ import com.movies.chris.trendingmovies.data.tmdb.model.Genre;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MovieDetail implements Parcelable
-{
+public class MovieDetail implements Parcelable {
 
+    public final static Parcelable.Creator<MovieDetail> CREATOR = new Creator<MovieDetail>() {
+
+
+        @SuppressWarnings({
+                "unchecked"
+        })
+        public MovieDetail createFromParcel(Parcel in) {
+            return new MovieDetail(in);
+        }
+
+        public MovieDetail[] newArray(int size) {
+            return (new MovieDetail[size]);
+        }
+
+    };
     @SerializedName("backdrop_path")
     @Expose
     private String backdropPath;
@@ -57,28 +70,12 @@ public class MovieDetail implements Parcelable
     @SerializedName("videos")
     @Expose
     private VideoList videoList;
-    public final static Parcelable.Creator<MovieDetail> CREATOR = new Creator<MovieDetail>() {
-
-
-        @SuppressWarnings({
-            "unchecked"
-        })
-        public MovieDetail createFromParcel(Parcel in) {
-            return new MovieDetail(in);
-        }
-
-        public MovieDetail[] newArray(int size) {
-            return (new MovieDetail[size]);
-        }
-
-    }
-    ;
 
     protected MovieDetail(Parcel in) {
         this.backdropPath = ((String) in.readValue((String.class.getClassLoader())));
         Log.i("MovieDetail", "backdropPath = " + backdropPath);
         genres = new ArrayList<>();
-        in.readList(this.genres,(Genre.class.getClassLoader()));
+        in.readList(this.genres, (Genre.class.getClassLoader()));
         this.homepage = ((String) in.readValue((String.class.getClassLoader())));
         this.id = ((Integer) in.readValue((Integer.class.getClassLoader())));
         this.overview = ((String) in.readValue((String.class.getClassLoader())));
@@ -108,9 +105,13 @@ public class MovieDetail implements Parcelable
         return genres;
     }
 
+    public void setGenres(List<Genre> genres) {
+        this.genres = genres;
+    }
+
     public String getGenreNames() {
         String names = "";
-        for (Genre genre: genres) {
+        for (Genre genre : genres) {
             String name = genre.getName();
             names += name;
             if (name.equals(genres.get(genres.size() - 1).getName())) {
@@ -120,10 +121,6 @@ public class MovieDetail implements Parcelable
             }
         }
         return names;
-    }
-
-    public void setGenres(List<Genre> genres) {
-        this.genres = genres;
     }
 
     public String getHomepage() {
@@ -240,7 +237,7 @@ public class MovieDetail implements Parcelable
     }
 
     public int describeContents() {
-        return  0;
+        return 0;
     }
 
     public String[] getTrailerKeys() {
@@ -250,7 +247,6 @@ public class MovieDetail implements Parcelable
             trailerKeys[i] = videoList.getVideos().get(i).getKey();
 
         }
-
         return trailerKeys;
     }
 }

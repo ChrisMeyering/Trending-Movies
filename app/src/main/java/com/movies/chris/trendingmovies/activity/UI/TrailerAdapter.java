@@ -23,17 +23,25 @@ import butterknife.ButterKnife;
 
 public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerViewHolder> {
     private static final String TAG = TrailerAdapter.class.getSimpleName();
-    private String[] trailerIds;
     private final Context context;
     private final TrailerAdapterClickHandler clickHandler;
+    private String[] trailerIds;
+
+    public TrailerAdapter(Context context) {
+        this.context = context;
+        try {
+            clickHandler = (TrailerAdapterClickHandler) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement TrailerAdapterClickHandler");
+        }
+    }
 
     @Override
     public TrailerViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.trailer_list_item, parent, false);
         return new TrailerViewHolder(view);
     }
-
-
 
     @Override
     public void onBindViewHolder(TrailerViewHolder holder, int position) {
@@ -42,7 +50,6 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
 
     @Override
     public int getItemCount() {
-
         if (trailerIds == null)
             return 0;
         else
@@ -55,30 +62,19 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
     }
 
     public void releaseLoaders() {
-
     }
 
     public interface TrailerAdapterClickHandler {
         void watchTrailer(String trailerKey);
     }
 
-    public TrailerAdapter(Context context) {
-        this.context = context;
-        try {
-            clickHandler = (TrailerAdapterClickHandler) context;
-        } catch (ClassCastException e){
-            throw new ClassCastException(context.toString()
-                    + " must implement TrailerAdapterClickHandler");
-        }
-    }
-
-
     public class TrailerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         @BindView(R.id.youtube_thumb_view)
         ImageView youtubeThumbView;
         @BindView(R.id.pb_loading_thumb)
         ProgressBar pbLoadingThumb;
-        public TrailerViewHolder(View view){
+
+        public TrailerViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
             youtubeThumbView.setOnClickListener(this);
@@ -95,6 +91,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
                         public void onSuccess() {
                             pbLoadingThumb.setVisibility(View.INVISIBLE);
                         }
+
                         @Override
                         public void onError(Exception e) {
                             e.printStackTrace();

@@ -16,19 +16,20 @@ import static com.movies.chris.trendingmovies.data.tmdb.remote.ApiUtils.QUERY_PA
 import static com.movies.chris.trendingmovies.data.tmdb.remote.ApiUtils.QUERY_PARAM_APPEND_VIDEOS;
 import static com.movies.chris.trendingmovies.data.tmdb.remote.ApiUtils.QUERY_PARAM_MOVIE_NAME;
 import static com.movies.chris.trendingmovies.data.tmdb.remote.ApiUtils.QUERY_PARAM_PAGE_NUMBER;
+
 /**
  * Created by chris on 3/2/18.
  */
 
 public interface MovieApiInterface {
 
-    @GET("movie/{"+ PATH_PARAM_SORT_BY +"}")
+    @GET("movie/{" + PATH_PARAM_SORT_BY + "}")
     Call<MovieList> getSortedMovieList(@Path(PATH_PARAM_SORT_BY) String sortBy,
                                        @Query(QUERY_PARAM_PAGE_NUMBER) int pageNumber);
 
     @GET("search/movie")
     Call<MovieList> searchByMovieName(@Query(QUERY_PARAM_MOVIE_NAME) String movieName,
-                           @Query(QUERY_PARAM_PAGE_NUMBER) int pageNumber);
+                                      @Query(QUERY_PARAM_PAGE_NUMBER) int pageNumber);
 
     @GET("movie/{" + PATH_PARAM_MOVIE_ID + "}?"
             + QUERY_PARAM_APPEND_TO_RESPONSE + "="

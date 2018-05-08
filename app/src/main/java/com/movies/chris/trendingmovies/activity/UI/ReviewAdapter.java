@@ -61,7 +61,8 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
-        public void bind(Review review){
+
+        public void bind(Review review) {
             tvAuthor.setText(review.getAuthor());
             tvReview.setText(review.getContent());
             itemView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);

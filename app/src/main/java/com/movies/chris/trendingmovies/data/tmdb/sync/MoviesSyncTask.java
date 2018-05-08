@@ -4,11 +4,8 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
 import com.movies.chris.trendingmovies.R;
 import com.movies.chris.trendingmovies.data.provider.MoviesContract;
@@ -26,10 +23,9 @@ import retrofit2.Response;
  */
 
 public class MoviesSyncTask {
-    private static final String TAG = MoviesSyncTask.class.getSimpleName();
     public static final String EVENT_SYNC_COMPLETE = "com.movies.chris.trendingmovies.data.tmbd.sync.SYNC_COMPLETE";
     public static final String EVENT_MOVIE_DETAIL_RECEIVED = "com.movies.chris.trendingmovies.data.tmbd.sync.MOVIE_DETAIL_RECEIVED";
-
+    private static final String TAG = MoviesSyncTask.class.getSimpleName();
 
     public static void getMovieDetail(final Context context, final int movieID) {
         MovieApiInterface movieApiInterface = ApiUtils.getMovieApiInterface();
@@ -44,7 +40,6 @@ public class MoviesSyncTask {
 
             @Override
             public void onFailure(Call<MovieDetail> call, Throwable t) {
-
                 Intent intent = new Intent(EVENT_MOVIE_DETAIL_RECEIVED);
                 LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
             }
@@ -53,9 +48,8 @@ public class MoviesSyncTask {
 
     synchronized public static void syncMovies(final Context context, final Uri uri, String sortBy, int pageNumber) {
         MovieApiInterface movieApiInterface = ApiUtils.getMovieApiInterface();
-        Log.i(TAG + ".syncMovies" , "sortBt = " + sortBy + " || pageNumber = " + pageNumber);
-        Log.i(TAG + ".syncMovies" , "uri = " + uri.toString());
-
+        Log.i(TAG + ".syncMovies", "sortBt = " + sortBy + " || pageNumber = " + pageNumber);
+        Log.i(TAG + ".syncMovies", "uri = " + uri.toString());
         Call<MovieList> call;
         if (uri.equals(MoviesContract.MovieNameEntry.CONTENT_URI))
             call = movieApiInterface.searchByMovieName(sortBy, pageNumber);

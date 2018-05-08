@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.constraint.ConstraintLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:focusable="false"
-    style="@style/FramedItemLayout">
+    style="@style/FramedItemLayout"
+    android:focusable="false">
 
     <TextView
         android:id="@+id/tv_reviews"
@@ -17,8 +17,8 @@
         android:id="@+id/rv_reviews"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
         android:orientation="vertical"
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -10,10 +10,10 @@ import com.movies.chris.trendingmovies.data.provider.MoviesContract;
 public class MoviesSyncJobService extends JobService {
     public static final String TAG = MoviesSyncJobService.class.getSimpleName();
     public static final String ACTION_START_DELETION = "com.movies.chris.trendingmoies.ACTION_START_DELETION";
+
     @Override
     public boolean onStartJob(JobParameters job) {
         Log.i(TAG, "onStartJob");
-
         if (job.getTag().equals(ACTION_START_DELETION)) {
 //            MoviesSyncUtils.clearTmdbData(this);
             ContentResolver cr = this.getContentResolver();
