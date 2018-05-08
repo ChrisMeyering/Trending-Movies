@@ -29,32 +29,50 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.MovieListActivity" />
         </activity>
-
-        <activity android:name=".activity.WatchTrailerActivity"
-            android:screenOrientation="landscape"
+        <activity
+            android:name=".activity.WatchTrailerActivity"
             android:parentActivityName=".activity.MovieDetailActivity"
+            android:screenOrientation="landscape"
             android:theme="@style/AppTheme.NoActionBar.FullScreen">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.MovieDetailActivity"
-                />
+                android:value=".activity.MovieDetailActivity" />
         </activity>
 
         <provider
             android:name=".data.provider.MoviesProvider"
             android:authorities="@string/content_authority"
-            android:exported="false" />
+            android:exported="true" />
 
         <service
-            android:exported="false"
-            android:name=".data.tmdb.sync.MoviesSyncIntentService"/>
+            android:name=".data.tmdb.sync.MoviesSyncIntentService"
+            android:exported="false" />
         <service
-            android:exported="false"
-            android:name=".data.tmdb.sync.MoviesSyncJobService">
+            android:name=".data.tmdb.sync.MoviesSyncJobService"
+            android:exported="false">
             <intent-filter>
-                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
             </intent-filter>
         </service>
+
+        <receiver android:name=".widget.FavoritesWidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/favorites_widget_info" />
+        </receiver>
+
+        <service
+            android:name=".widget.FavoritesWidgetService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="false"/>
+
+        <service
+            android:name=".widget.GridWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
 
 </manifest>

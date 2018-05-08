@@ -43,5 +43,7 @@
     <string name="transition_movie_poster">movie poster transition</string>
     <string name="transition_pb">progress bar transition</string>
     <string name="action_sign_out">Sign Out</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 
 </resources>
