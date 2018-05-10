@@ -55,6 +55,7 @@ public class MovieDetailActivity extends AppCompatActivity
         implements TrailerAdapter.TrailerAdapterClickHandler {
 
     public static final int REQUEST_MOVIE_DETAIL = 99;
+    public static final String EXTRA_MOVIE_ID = "movie_id_key";
     AppBarLayout appBarLayout;
     ProgressBar pbLoadingBackdrop;
     ImageView ivBackdrop;
@@ -140,8 +141,8 @@ public class MovieDetailActivity extends AppCompatActivity
         } else if (startIntent != null) {
             if (startIntent.hasExtra(getString(R.string.transition_movie_poster)))
                 ivTransitionName = startIntent.getStringExtra(getString(R.string.transition_movie_poster));
-            if (startIntent.hasExtra(getString(R.string.key_movie_id))) {
-                movieID = startIntent.getIntExtra(getString(R.string.key_movie_id), 0);
+            if (startIntent.hasExtra(EXTRA_MOVIE_ID)) {
+                movieID = startIntent.getIntExtra(EXTRA_MOVIE_ID, 0);
                 pbLoadingDetails.setVisibility(View.VISIBLE);
                 MoviesSyncUtils.getTmdbMovieDetail(this, movieID);
             }
@@ -304,6 +305,7 @@ public class MovieDetailActivity extends AppCompatActivity
         tvReleaseDate.setText(movieDetail.getReleaseDate());
         tvGenres.setText(movieDetail.getGenreNames());
         tvRating.setText(String.valueOf(movieDetail.getVoteAverage()) + "/10");
+        findViewById(R.id.details_layout).setVisibility(View.VISIBLE);
         if (!movieDetail.getOverview().isEmpty()) {
             tvMovieInfo.setText(movieDetail.getOverview());
             findViewById(R.id.synopsis_layout).setVisibility(View.VISIBLE);

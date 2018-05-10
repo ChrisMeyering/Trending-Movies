@@ -1,5 +1,6 @@
 package com.movies.chris.trendingmovies.widget;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.widget.RemoteViews;
 
 import com.movies.chris.trendingmovies.R;
+import com.movies.chris.trendingmovies.activity.MovieDetailActivity;
 
 /**
  * Implementation of App Widget functionality.
@@ -31,6 +33,12 @@ public class FavoritesWidgetProvider extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.favorites_widget);
         Intent intent = new Intent(context, GridWidgetService.class);
         views.setRemoteAdapter(R.id.widget_grid_view, intent);
+
+        Intent detailIntent = new Intent(context, MovieDetailActivity.class);
+        PendingIntent detailPendingIntent = PendingIntent.getActivity(context, 0, detailIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        views.setPendingIntentTemplate(R.id.widget_grid_view, detailPendingIntent);
+        views.setEmptyView(R.id.widget_grid_view, R.id.empty_view);
         return views;
     }
 

@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 
 import com.movies.chris.trendingmovies.R;
+import com.movies.chris.trendingmovies.activity.MovieDetailActivity;
 
 /**
  * Created by chris on 11/2/17.
@@ -29,9 +30,9 @@ public class MoviesSyncIntentService extends IntentService {
                         intent.getStringExtra(getResources().getString(R.string.key_sort_by)),
                         intent.getIntExtra(getResources().getString(R.string.key_page_number), 1)
                 );
-            } else if (intent.hasExtra(getString(R.string.key_movie_id))) {
+            } else if (intent.hasExtra(MovieDetailActivity.EXTRA_MOVIE_ID)) {
                 MoviesSyncTask.getMovieDetail(this,
-                        intent.getIntExtra(getString(R.string.key_movie_id), -1)
+                        intent.getIntExtra(MovieDetailActivity.EXTRA_MOVIE_ID, -1)
                 );
             } else if (intent.getAction() != null && intent.getAction().equals(MoviesSyncJobService.ACTION_START_DELETION)) {
                 MoviesSyncTask.clearMovies(this);

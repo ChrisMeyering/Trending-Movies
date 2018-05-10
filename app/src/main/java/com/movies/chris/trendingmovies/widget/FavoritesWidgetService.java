@@ -46,11 +46,6 @@ public class FavoritesWidgetService extends JobIntentService {
     }
 
     private void handleActionUpdateFavorites() {
-        Cursor cursor = getContentResolver().query(MoviesContract.FavoritesEntry.CONTENT_URI,
-                null,
-                null,
-                null,
-                MoviesContract.FavoritesEntry.getSortOrder());
         Log.i(TAG, "Updating Favorites Widget");
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, FavoritesWidgetProvider.class));

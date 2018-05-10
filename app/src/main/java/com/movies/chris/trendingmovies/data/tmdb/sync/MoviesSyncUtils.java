@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.movies.chris.trendingmovies.R;
+import com.movies.chris.trendingmovies.activity.MovieDetailActivity;
 
 /**
  * Created by chris on 11/2/17.
@@ -39,7 +40,7 @@ public class MoviesSyncUtils {
 
     public static void getTmdbMovieDetail(@NonNull final Context context, int movieID) {
         Intent intent = new Intent(context, MoviesSyncIntentService.class);
-        intent.putExtra(context.getString(R.string.key_movie_id), movieID);
+        intent.putExtra(MovieDetailActivity.EXTRA_MOVIE_ID, movieID);
         context.startService(intent);
     }
 }

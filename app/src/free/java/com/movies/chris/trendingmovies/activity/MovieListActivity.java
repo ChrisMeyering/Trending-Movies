@@ -646,7 +646,7 @@ public class MovieListActivity extends AppCompatActivity
         Intent detailIntent = new Intent(MovieListActivity.this, MovieDetailActivity.class);
         String imageTransitionName = ViewCompat.getTransitionName(sharedView);
         String progressTransitionName = ViewCompat.getTransitionName(pbLoadingMovieList);
-        detailIntent.putExtra(getString(R.string.key_movie_id), id);
+        detailIntent.putExtra(MovieDetailActivity.EXTRA_MOVIE_ID, id);
         detailIntent.putExtra(getString(R.string.transition_movie_poster), imageTransitionName);
         Pair<View, String> p1 = Pair.create((View) sharedView, imageTransitionName);
         Pair<View, String> p2 = Pair.create((View) pbLoadingMovieList, progressTransitionName);

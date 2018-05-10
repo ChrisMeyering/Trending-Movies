@@ -5,11 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import com.movies.chris.trendingmovies.activity.MovieDetailActivity;
 import com.movies.chris.trendingmovies.data.provider.MoviesContract;
 import com.movies.chris.trendingmovies.data.tmdb.model.list.MoviePoster;
 import com.movies.chris.trendingmovies.utils.MediaUtils;
@@ -82,12 +84,19 @@ class GridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         MoviePoster poster = MoviePoster.getPoster(cursor);
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.favorites_widget_list_item);
         try {
-            Bitmap b = Picasso.get().load(MediaUtils.buildPosterURL(poster.posterPath, 0)).get();
-            views.setImageViewBitmap(R.id.iv_widget_movie_poster, b);
+            Bitmap b =
+                    Picasso.get()
+                    .load(MediaUtils.buildPosterURL(poster.posterPath, 0)).get();
+            if (b != null)
+                views.setImageViewBitmap(R.id.iv_widget_movie_poster, b);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        Bundle extras = new Bundle();
+        extras.putInt(MovieDetailActivity.EXTRA_MOVIE_ID, poster.id);
+        Intent fillInIntent = new Intent();
+        fillInIntent.putExtras(extras);
+        views.setOnClickFillInIntent(R.id.iv_widget_movie_poster, fillInIntent);
         return views;
     }
 

@@ -29,7 +29,6 @@
     <string name="key_page_number">PAGE_NUMBER_EXTRA</string>
     <string name="exception_drawer_item_not_implemented">Drawer item not implemented</string>
     <string name="key_sync_success">event.sync.success</string>
-    <string name="key_movie_id">movie_id_key</string>
     <string name="key_movie_detail">movie_detail_key</string>
     <string name="key_trailer_id">trailer_id_key</string>
     <string name="key_scroll_view_postition">scroll_view_position_key</string>
@@ -45,5 +44,6 @@
     <string name="action_sign_out">Sign Out</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="noFavorites">No favorites to show!</string>
 
 </resources>
