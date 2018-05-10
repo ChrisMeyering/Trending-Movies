@@ -3,17 +3,13 @@ package com.movies.chris.trendingmovies.widget;
 import android.app.IntentService;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
-import android.content.ContentProvider;
-import android.content.Intent;
 import android.content.Context;
-import android.database.Cursor;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.JobIntentService;
 import android.util.Log;
 
 import com.movies.chris.trendingmovies.R;
-import com.movies.chris.trendingmovies.data.provider.MoviesContract;
-import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncUtils;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -31,18 +27,18 @@ public class FavoritesWidgetService extends JobIntentService {
         super();
     }
 
+    public static void startActionUpdateFavorites(Context context) {
+        Intent intent = new Intent(context, FavoritesWidgetService.class);
+        intent.setAction(ACTION_UPDATE_FAVORITES_WIDGET);
+        context.startService(intent);
+    }
+
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
         final String action = intent.getAction();
         if (ACTION_UPDATE_FAVORITES_WIDGET.equals(action)) {
             handleActionUpdateFavorites();
         }
-    }
-
-    public static void startActionUpdateFavorites(Context context) {
-        Intent intent = new Intent(context, FavoritesWidgetService.class);
-        intent.setAction(ACTION_UPDATE_FAVORITES_WIDGET);
-        context.startService(intent);
     }
 
     private void handleActionUpdateFavorites() {

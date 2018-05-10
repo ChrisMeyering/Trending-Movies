@@ -1,16 +1,15 @@
 package com.movies.chris.trendingmovies.widget;
 
-import com.movies.chris.trendingmovies.R;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import com.movies.chris.trendingmovies.R;
 import com.movies.chris.trendingmovies.activity.MovieDetailActivity;
 import com.movies.chris.trendingmovies.data.provider.MoviesContract;
 import com.movies.chris.trendingmovies.data.tmdb.model.list.MoviePoster;
@@ -47,7 +46,6 @@ class GridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public void onDataSetChanged() {
-
         if (cursor != null) {
             cursor.close();
         }
@@ -86,7 +84,7 @@ class GridRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         try {
             Bitmap b =
                     Picasso.get()
-                    .load(MediaUtils.buildPosterURL(poster.posterPath, 0)).get();
+                            .load(MediaUtils.buildPosterURL(poster.posterPath, 0)).get();
             if (b != null)
                 views.setImageViewBitmap(R.id.iv_widget_movie_poster, b);
         } catch (IOException e) {

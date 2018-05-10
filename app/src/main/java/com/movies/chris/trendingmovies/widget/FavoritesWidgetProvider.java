@@ -33,7 +33,6 @@ public class FavoritesWidgetProvider extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.favorites_widget);
         Intent intent = new Intent(context, GridWidgetService.class);
         views.setRemoteAdapter(R.id.widget_grid_view, intent);
-
         Intent detailIntent = new Intent(context, MovieDetailActivity.class);
         PendingIntent detailPendingIntent = PendingIntent.getActivity(context, 0, detailIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);

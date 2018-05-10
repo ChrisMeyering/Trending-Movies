@@ -20,7 +20,8 @@
         android:adjustViewBounds="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/powered_by_square_tmdb_green" />
+        app:srcCompat="@drawable/powered_by_square_tmdb_green"
+        android:contentDescription="@string/powered_by_tmdb" />
 
     <ProgressBar
         android:id="@+id/pb_loading_user_info"
@@ -40,7 +41,8 @@
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/iv_powered_by_tmdb"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/iv_powered_by_tmdb" />
+        app:layout_constraintTop_toTopOf="@id/iv_powered_by_tmdb"
+        android:contentDescription="@string/img_desc_user_photo" />
 
     <TextView
         android:id="@+id/tv_user_name"

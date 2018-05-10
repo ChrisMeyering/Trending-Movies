@@ -13,8 +13,18 @@ android {
         buildConfigField("String", "WEB_CLIENT_ID", GoogleWebClientId);
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+    signingConfigs {
+        release {
+            storeFile file("debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+        }
+    }
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             postprocessing {
                 removeUnusedCode false
                 removeUnusedResources false
@@ -22,6 +32,9 @@ android {
                 optimizeCode false
                 proguardFile 'proguard-rules.pro'
             }
+        }
+        debug {
+            signingConfig signingConfigs.release
         }
     }
     flavorDimensions "default"
@@ -58,10 +71,9 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation "com.jakewharton:butterknife:$buterknifeLibraryVersion"
     annotationProcessor "com.jakewharton:butterknife-compiler:$buterknifeLibraryVersion"
-    debugImplementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
     freeImplementation 'com.google.android.gms:play-services-ads:15.0.1'
     implementation 'com.google.android.gms:play-services-auth:15.0.1'
-    implementation 'com.google.firebase:firebase-core:15.0.2'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
