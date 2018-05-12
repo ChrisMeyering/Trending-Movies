@@ -2,7 +2,10 @@ package com.movies.chris.trendingmovies.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Application;
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -38,12 +41,14 @@ import android.widget.TextView;
 import com.movies.chris.trendingmovies.R;
 import com.movies.chris.trendingmovies.activity.UI.ReviewAdapter;
 import com.movies.chris.trendingmovies.activity.UI.TrailerAdapter;
+import com.movies.chris.trendingmovies.activity.UI.Utility;
 import com.movies.chris.trendingmovies.data.tmdb.model.detail.MovieDetail;
 import com.movies.chris.trendingmovies.data.tmdb.model.list.MoviePoster;
 import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncTask;
 import com.movies.chris.trendingmovies.data.tmdb.sync.MoviesSyncUtils;
 import com.movies.chris.trendingmovies.utils.MediaUtils;
 import com.movies.chris.trendingmovies.utils.MovieUtils;
+import com.movies.chris.trendingmovies.widget.FavoritesWidgetProvider;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -157,9 +162,6 @@ public class MovieDetailActivity extends AppCompatActivity
 
     public void toggleFavorite() {
         Log.i(TAG, "toggle favorite");
-//        int resID = swapFavoriteImageResource(this, fabFavorite,
-//                movieDetail.getId(),
-//                movieDetail.getPosterPath());
         final MoviePoster poster = new MoviePoster(movieDetail.getId(), movieDetail.getPosterPath());
         if (MovieUtils.swapFavoriteImageResource(this, fabFavorite, poster)) {
             Snackbar snackbar = Snackbar
@@ -184,6 +186,7 @@ public class MovieDetailActivity extends AppCompatActivity
                     });
             snackbar.show();
         }
+        Utility.updateWidget(getApplication());
         invalidateOptionsMenu();
     }
 

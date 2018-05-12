@@ -52,6 +52,7 @@ import com.firebase.jobdispatcher.Trigger;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.common.SignInButton;
 import com.movies.chris.trendingmovies.R;
 import com.movies.chris.trendingmovies.activity.UI.MovieListAdapter;
 import com.movies.chris.trendingmovies.activity.UI.Utility;
@@ -193,20 +194,12 @@ public class MovieListActivity extends AppCompatActivity
         initJobDispatcher();
         initView();
         makeSortedMovieSearch();
-        Toast.makeText(this, "free flavor", Toast.LENGTH_SHORT).show();
     }
 
     private void loadInterstitialAd() {
         mInterstitialAd = new InterstitialAd(this);
         mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
-        mInterstitialAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                super.onAdLoaded();
-                Toast.makeText(MovieListActivity.this, "Add loaded", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     private void initJobDispatcher() {
@@ -334,6 +327,8 @@ public class MovieListActivity extends AppCompatActivity
                 return false;
             }
         });
+        View header = navView.getHeaderView(0);
+        header.findViewById(R.id.btn_google_signin).setVisibility(View.GONE);
         initDrawerLayout();
         initRecyclerView();
     }
@@ -602,7 +597,7 @@ public class MovieListActivity extends AppCompatActivity
                     });
             snackbar.show();
         }
-
+        Utility.updateWidget(getApplication());
     }
 
     @Override

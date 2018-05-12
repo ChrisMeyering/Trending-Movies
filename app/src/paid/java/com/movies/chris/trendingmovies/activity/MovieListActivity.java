@@ -343,7 +343,6 @@ public class MovieListActivity extends AppCompatActivity
         btnGoogleSignin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MovieListActivity.this, "signin clicked", Toast.LENGTH_SHORT).show();
                 Intent signInIntent = googleSignInClient.getSignInIntent();
                 pbLoadingUserInfo.setVisibility(View.VISIBLE);
                 startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -650,7 +649,7 @@ public class MovieListActivity extends AppCompatActivity
                     });
             snackbar.show();
         }
-
+        Utility.updateWidget(getApplication());
     }
 
     @Override
@@ -750,7 +749,6 @@ public class MovieListActivity extends AppCompatActivity
 
 
     private void firebaseAuth(GoogleSignInAccount account) {
-        Toast.makeText(this, "Authentiating with firebase", Toast.LENGTH_SHORT).show();
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
